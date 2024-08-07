@@ -4,10 +4,11 @@ from matplotlib.animation import PillowWriter
 from .Solver import *
 from matplotlib.gridspec import GridSpec
 from matplotlib.axes import Axes
+from typing import Tuple, Optional
 
 class Animator():
 
-    def __init__(self, sol:Solver, fps:int = 15, metadata:dict = None, xlim:tuple[float, float] = None, ylim:tuple[float, float] = None, tlim:tuple[float, float] = None) -> None:
+    def __init__(self, sol:Solver, fps:int = 15, metadata:Optional[dict] = None, xlim:Tuple[float, float] = None, ylim:Tuple[float, float] = None, tlim:Tuple[float, float] = None) -> None:
         #basic data
         self.time = sol.timesteps
         self.n_timesteps = sol.n_timesteps

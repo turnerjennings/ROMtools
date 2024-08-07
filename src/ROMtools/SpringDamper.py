@@ -2,10 +2,11 @@ import numpy as np
 from math import cos, sin
 from .RigidBody import *
 import time 
+from typing import Tuple, Optional
 
 class SpringDamper():
 
-    def __init__(self, k:float, c:float, p:float = 0.0, parent:RigidBody=None, child:RigidBody=None,  parent_pos:tuple[float,float] = (0.0, 0.0), child_pos:tuple[float,float] = (0.0, 0.0), dof_constraint:tuple[bool,bool,bool] = (False, False, False)) -> None:
+    def __init__(self, k:float, c:float, p:float = 0.0, parent:Optional[RigidBody]=None, child:Optional[RigidBody]=None,  parent_pos:Tuple[float,float] = (0.0, 0.0), child_pos:Tuple[float,float] = (0.0, 0.0), dof_constraint:Tuple[bool,bool,bool] = (False, False, False)) -> None:
         if parent is not None:
             self.parent = parent.ID
             self.xp = parent_pos[0]
@@ -55,7 +56,7 @@ class SpringDamper():
         self.l0 = np.linalg.norm([self.lx0,self.ly0])
         self.l0t = t0p-t0c
 
-    def _RelativePos(self, p:np.ndarray, v:np.ndarray = None) -> tuple[float, float, float, float]:
+    def _RelativePos(self, p:np.ndarray, v:Optional[np.ndarray] = None) -> Tuple[float, float, float, float]:
         #define variables from dof for convenience
 
         if v is not None:

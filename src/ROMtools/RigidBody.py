@@ -2,10 +2,11 @@ import numpy as np
 from math import pi,cos,sin
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from typing import Tuple, Optional
 
 class RigidBody():
 
-    def __init__(self, ID:int, m:float, R:float, name:str = "", cm:tuple[float, float, float] = (0.0, 0.0, 0.0), I:float = None, dof_constraint:tuple[bool,bool,bool] = (False, False, False)) -> None:
+    def __init__(self, ID:int, m:float, R:float, name:str = "", cm:Tuple[float, float, float] = (0.0, 0.0, 0.0), I:Optional[float] = None, dof_constraint:Tuple[bool,bool,bool] = (False, False, False)) -> None:
         self.ID = ID
         self.name = name
         self.m = m

@@ -4,6 +4,7 @@ from .SpringDamper import *
 from .Configuration import *
 from .Force import Force
 from time import time
+import warnings
 
 class Solver():
 
@@ -52,23 +53,36 @@ class Solver():
             self.acceleration_array[0,3*body.ID:3*body.ID+3] = np.array(body.a0)
 
     def Solve(self):
+        fail = -1
         print("Solving model...")
         start_time = time()
-        if self.config.solver_type == "RK4":
-            for i in range(self.n_timesteps-1):
-                self._RK4(i)
-        elif self.config.solver_type == "FwdEuler":
-            for i in range(self.n_timesteps-1):
-                self._FwdEuler(i)
-        elif self.config.solver_type == "CentralDifference":
-            for i in range(self.n_timesteps-1):
-                self._CentralDifference(i,self.config.alpha)
-        else:
-            raise TypeError("Solver type not supported")
+        for i in range(self.n_timesteps-1):
+            if self.config.solver_type == "RK4":
+                    self._RK4(i)
+            elif self.config.solver_type == "FwdEuler":
+                    self._FwdEuler(i)
+            elif self.config.solver_type == "CentralDifference":
+                    self._CentralDifference(i,self.config.alpha)
+            else:
+                raise TypeError("Solver type not supported")
+            
+            pcheck = np.isnan(self.position_array[i,:])+np.isnan(self.velocity_array[i,:])+np.isnan(self.acceleration_array[i,:])
+            
+            if np.sum(pcheck) > 0:
+                fail = i
+                warnings.warn("WARNING: NaN values calculated at timestep {i}, terminating simulation")
+                np.nan_to_num(self.position_array, nan=0.0)
+                np.nan_to_num(self.velocity_array, nan=0.0)
+                np.nan_to_num(self.acceleration_array, nan=0.0)
+
+                break
 
         self._SaveData()
         end_time = time()
-        print(f"Solution complete, time elapsed: {end_time - start_time:.3f}")
+        if fail > 0:
+            print(f"Solution failed on timestep {i}, time elapsed: {end_time - start_time:.3f}")
+        else:
+            print(f"Solution complete, time elapsed: {end_time - start_time:.3f}")
 
 
 
