@@ -120,12 +120,12 @@ class SpringDamper():
                 child_t = 0.0
 
         #calculate parent and child relative positions
-        rpx = parent_x + self.xp*cos(parent_t) + self.yp*sin(parent_t)
+        rpx = parent_x + self.xp*cos(parent_t) - self.yp*sin(parent_t)
         rpy = parent_y + self.yp*cos(parent_t) + self.xp*sin(parent_t)
-
+        
         
 
-        rcx = child_x + self.xc*cos(child_t) + self.yc*sin(child_t)
+        rcx = child_x + self.xc*cos(child_t) - self.yc*sin(child_t)
         rcy = child_y + self.yc*cos(child_t) + self.xc*sin(child_t)
 
         #calculate torque moment arms
@@ -158,8 +158,7 @@ class LinearSpringDamper(SpringDamper):
         r_rely = rpy-rcy
         
         disp_mag = np.linalg.norm([r_relx,r_rely])
-        stretch = disp_mag + p - self.l0
-
+        stretch = disp_mag + self.p - self.l0
         if disp_mag > 0.0:
             unit_vec = np.array([r_relx,r_rely])/disp_mag
 
@@ -171,7 +170,8 @@ class LinearSpringDamper(SpringDamper):
             F_kx = 0
             F_ky = 0
 
-
+        #print(rpx, rpy, rcx, rcy, vpx, vpy, vcx, vcy)
+        #time.sleep(0.1)
 
         #calculate torque moment arms
         
@@ -245,10 +245,10 @@ class RotationalSpringDamper(SpringDamper):
             child_dt = 0.0
 
         #print(f"parent_t={parent_t}, child_t = {child_t}")
-        T_k=self.k*(parent_t-child_t + p -self.l0t)
+        T_k=self.k*(parent_t-child_t + self.p -self.l0t)
         T_c=self.c*(parent_dt-child_dt)
 
         forces[3*self.parent+2] = -T_k-T_c
         forces[3*self.child+2] = T_k+T_c
 
-        return -forces
+        return forces

@@ -49,7 +49,7 @@ class Solver():
         for body in bodies:
             self.position_array[0,3*body.ID:3*body.ID+3] = np.array(body.p0)
             self.velocity_array[0,3*body.ID:3*body.ID+3] = np.array(body.v0)
-            self.velocity_array[0,3*body.ID:3*body.ID+3] = np.array(body.a0)
+            self.acceleration_array[0,3*body.ID:3*body.ID+3] = np.array(body.a0)
 
     def Solve(self):
         print("Solving model...")

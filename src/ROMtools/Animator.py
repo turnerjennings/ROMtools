@@ -73,7 +73,9 @@ class Animator():
     def animate_concise(self):
         writer = PillowWriter(fps = self.fps, metadata = self.metadata)
 
-        fig, ax = plt.figure(figsize = (10,10))
+        fig, ax = plt.subplots(1,1,figsize = (7,7))
+
+        ax = plt.subplot(1,1,1)
 
         frames = np.arange(0,self.n_timesteps,self.n_timesteps/self.n_frames, dtype = int)
 
@@ -114,7 +116,7 @@ class Animator():
                 ax.set_xlim(self.xlim[0],self.xlim[1])
                 ax.set_ylim(self.ylim[0],self.ylim[1])
                 ax.legend()
-                ax.title(f"Time = {self.time[i]:.4f}")
+                ax.set_title(f"Time = {self.time[i]:.4f}")
 
                 writer.grab_frame()
 
@@ -149,15 +151,21 @@ class Animator():
                         label = None
 
 
+
                     body_pos = self.pos[frames[:idx+1],3*body.ID:3*body.ID+3]
                     body_time = self.time[frames[:idx+1]]
                     #print(body_pos)
 
+                    
+
 
                     if self.body_colors is not None:
                         color = self.body_colors[j]
+
+                        ax_anim.plot(body_pos[:,0], body_pos[:,1], color = color, label=label, alpha = 0.1)
+                        ax_anim.scatter(body_pos[-1,0], body_pos[-1,1], color = color, s = 2, label=label)
+
                         #render body
-                        ax_anim.plot(body_pos[:,0], body_pos[:,1],color = color, label=label)
                         body.render_body(ax_anim,body_pos[-1,:],color)
 
                         #render xyz position
@@ -167,7 +175,8 @@ class Animator():
 
 
                     else:
-                        ax_anim.plot(body_pos[:,0], body_pos[:,1], label=label)
+                        ax_anim.plot(body_pos[:,0], body_pos[:,1], label=label, alpha = 0.1)
+                        ax_anim.scatter(body_pos[-1,0], body_pos[-1,1], s = 10, label=label)
                         body.render_body(ax_anim,body_pos[-1,:])
                         ax_xpos.plot(body_time, body_pos[:,0], label = label)
                         ax_ypos.plot(body_time, body_pos[:,1], label = label)

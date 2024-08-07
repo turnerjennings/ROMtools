@@ -69,9 +69,16 @@ class Semicircle(RigidBody):
         return 0.5*self.m*self.R**2
     
     def render_body(self,ax:Axes,p:np.ndarray, color:str = "red"):
-        xcen=p[0]
-        ycen=p[1]
+        xcm = 0.0
+        ycm = 0.0
+        theta = 0.0
+
+        xcm=p[0] 
+        ycm=p[1] 
         theta=p[2]
+
+        xcen=xcm + 4*self.R/(3*pi)*sin(theta)
+        ycen = ycm - 4*self.R/(3*pi)*cos(theta)
 
         theta_array = np.linspace(0,pi,50)
         head_points_x = xcen + self.R * np.cos(theta+theta_array)
@@ -87,7 +94,7 @@ class Semicircle(RigidBody):
         ax.plot(angle_line_x, angle_line_y, color="black", alpha=0.5)
     
     
-class Semicircle(RigidBody):
+class circle(RigidBody):
 
     def _inertia(self):
         return self.m*self.R**2
