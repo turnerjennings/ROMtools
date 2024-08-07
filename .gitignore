@@ -1,3 +1,6 @@
 *.csv
 *.gif
 __pycache__
+build
+dist
+ROMtools.egg-info
