@@ -4,7 +4,7 @@ from math import cos, sin
 from ROMtools.RigidBody import RigidBody
 from .RigidBody import *
 import time
-from typing import Tuple, Optional,Literal
+from typing import Tuple, Optional, Literal
 
 
 class SpringDamper:
@@ -180,15 +180,15 @@ class LinearSpringDamper(SpringDamper):
         k: float,
         c: float,
         p: float = 0,
-        parent: RigidBody | None = None,
-        child: RigidBody | None = None,
+        parent: Optional[RigidBody] = None,
+        child: Optional[RigidBody] = None,
         parent_pos: Tuple[float] = (0, 0),
         child_pos: Tuple[float] = (0, 0),
         dof_constraint: Tuple[bool] = (False, False, False),
         type: Literal["Linear", "Tensile", "Compressive", "Tabular"] = "Linear",
-        curve: np.ndarray = None
+        curve: np.ndarray = None,
     ) -> None:
-        
+
         super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint)
         self.type = type
 
@@ -196,10 +196,11 @@ class LinearSpringDamper(SpringDamper):
             if curve is not None:
                 self.kcurve = curve
             else:
-                raise ValueError("Input argument Curve required for tabular spring type")
+                raise ValueError(
+                    "Input argument Curve required for tabular spring type"
+                )
         else:
             self.kcurve = None
-                
 
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
         forces = np.zeros(p.shape)
@@ -213,45 +214,42 @@ class LinearSpringDamper(SpringDamper):
         r_rely = rpy - rcy
 
         disp_mag = np.linalg.norm([r_relx, r_rely])
-        
+
         if disp_mag > 0.0:
             unit_vec = np.array([r_relx, r_rely]) / disp_mag
             stretch = disp_mag + self.p - self.l0
         else:
             stretch = 0.0
-            unit_vec = np.array([0.0,0.0])
+            unit_vec = np.array([0.0, 0.0])
 
-        match self.type:
-            case "Linear":
+        if self.type == "Linear":
+            force_mag = self.k * stretch
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
+        elif self.type == "Tensile":
+            if stretch >= 0.0:
                 force_mag = self.k * stretch
-                F_kx = force_mag * unit_vec[0]
-                F_ky = force_mag * unit_vec[1]
-            case "Tensile":
-                if stretch >= 0.0:
-                    force_mag = self.k * stretch
-                else:
-                    force_mag = 0.0
-                
-                F_kx = force_mag * unit_vec[0]
-                F_ky = force_mag * unit_vec[1]
-            case "Compressive":
-                if stretch <= 0.0:
-                    force_mag = self.k * stretch
-                else:
-                    force_mag = 0.0
-                
-                F_kx = force_mag * unit_vec[0]
-                F_ky = force_mag * unit_vec[1]
+            else:
+                force_mag = 0.0
 
-            case "Tabular":
-                force_mag = np.interp(abs(stretch),self.kcurve[:,0],self.kcurve[:,1])
-                if stretch < 0:
-                    force_mag = -1* force_mag
-                
-                F_kx = force_mag * unit_vec[0]
-                F_ky = force_mag * unit_vec[1]
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
+        elif self.type == "Compressive":
+            if stretch <= 0.0:
+                force_mag = self.k * stretch
+            else:
+                force_mag = 0.0
 
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
 
+        elif self.type == "Tabular":
+            force_mag = np.interp(abs(stretch), self.kcurve[:, 0], self.kcurve[:, 1])
+            if stretch < 0:
+                force_mag = -1 * force_mag
+
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
 
         # print(rpx, rpy, rcx, rcy, vpx, vpy, vcx, vcy)
         # time.sleep(0.1)
@@ -302,6 +300,31 @@ class LinearSpringDamper(SpringDamper):
 
 class RotationalSpringDamper(SpringDamper):
 
+    def __init__(
+        self,
+        k: float,
+        c: float,
+        p: float = 0,
+        parent: Optional[RigidBody] = None,
+        child: Optional[RigidBody] = None,
+        parent_pos: Tuple[float] = (0, 0),
+        child_pos: Tuple[float] = (0, 0),
+        dof_constraint: Tuple[bool] = (False, False, False),
+        type: Literal["Linear","Linked"] = "Linear",
+        link: Optional[LinearSpringDamper] = None,
+        linkcoef: Tuple[float] = (1,1)
+    ) -> None:
+        super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint)
+
+        self.type = type
+        if self.type == "Linked":
+            if link is not None:
+                self.link = link
+                self.linkingcoef = linkcoef
+            else:
+                raise ValueError("Linked linear spring must be specified for Linked type")
+
+
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
         forces = np.zeros(p.shape)
 
@@ -325,8 +348,17 @@ class RotationalSpringDamper(SpringDamper):
             child_dt = 0.0
 
         # print(f"parent_t={parent_t}, child_t = {child_t}")
-        T_k = self.k * (parent_t - child_t + self.p - self.l0t)
-        T_c = self.c * (parent_dt - child_dt)
+            
+        if self.type == "Linear":
+            T_k = self.k * (parent_t - child_t + self.p - self.l0t)
+            T_c = self.c * (parent_dt - child_dt)
+        elif self.type == "Linked":
+            linspringforce = self.link.calculate_force(p,v)
+            forcemag = np.linalg.norm([linspringforce[3 * self.parent],linspringforce[3 * self.parent + 1]])
+
+            T_k =  forcemag*self.linkingcoef[0] * (parent_t - child_t + self.p - self.l0t)
+            T_c =  forcemag*self.linkingcoef[0] * (parent_dt - child_dt)
+
 
         forces[3 * self.parent + 2] = -T_k - T_c
         forces[3 * self.child + 2] = T_k + T_c
