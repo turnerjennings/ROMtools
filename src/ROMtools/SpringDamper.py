@@ -185,11 +185,21 @@ class LinearSpringDamper(SpringDamper):
         parent_pos: Tuple[float] = (0, 0),
         child_pos: Tuple[float] = (0, 0),
         dof_constraint: Tuple[bool] = (False, False, False),
-        type: Literal["Linear", "Tensile", "Compressive"] = "Linear"
+        type: Literal["Linear", "Tensile", "Compressive", "Tabular"] = "Linear",
+        curve: np.ndarray = None
     ) -> None:
         
         super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint)
         self.type = type
+
+        if self.type == "Tabular":
+            if curve is not None:
+                self.kcurve = curve
+            else:
+                raise ValueError("Input argument Curve required for tabular spring type")
+        else:
+            self.curve = None
+                
 
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
         forces = np.zeros(p.shape)
@@ -230,6 +240,11 @@ class LinearSpringDamper(SpringDamper):
                 else:
                     force_mag = 0.0
                 
+                F_kx = force_mag * unit_vec[0]
+                F_ky = force_mag * unit_vec[1]
+
+            case "Tabular":
+                force_mag = np.interp(stretch,self.curve[:,0],self.curve[:,1])
                 F_kx = force_mag * unit_vec[0]
                 F_ky = force_mag * unit_vec[1]
 

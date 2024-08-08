@@ -10,7 +10,7 @@ sys.path.append(src_path)
 from ROMtools import *
 
 body1=Disc(0, 1, 1, cm=(0.0,1.0, 0.0),name="mass")
-body1.initial_conditions(p=(0.0,-0.1,0.0))
+body1.initial_conditions(p=(0.0,0.1,0.0))
 
 spring1 = LinearSpringDamper(100,0,0,body1,child=None,child_pos=(0,0),type = "Compressive")
 
@@ -29,7 +29,7 @@ config.update_from_dict({
 config_FE = RunConfiguration()
 config_FE.update_from_dict({
     "output_path":"T:/codes/ROMtools/scripts/",
-    "output_name":"1dof",
+    "output_name":"fwdEuler",
     "solver_type": "FwdEuler",
     "n_timesteps": 10000,
     "termination_time":0.5
@@ -38,18 +38,19 @@ config_FE.update_from_dict({
 config_CD = RunConfiguration()
 config_CD.update_from_dict({
     "output_path":"T:/codes/ROMtools/scripts/",
-    "output_name":"1dof",
+    "output_name":"CenDif",
     "solver_type": "CentralDifference",
     "n_timesteps": 10000,
     "termination_time":0.5
 })
-
 
 solver_RK = Solver([body1], [spring1], config=config)
 solver_RK.Solve()
 
 solver_FE = Solver([body1], [spring1], config=config_FE)
 solver_FE.Solve()
+
+
 
 solver_CD = Solver([body1], [spring1], config=config_CD)
 solver_CD.Solve()

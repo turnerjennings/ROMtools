@@ -168,7 +168,6 @@ class Solver:
         forces_out = np.empty(p.shape)
         for spring in self.springs:
             forces_out += spring.calculate_force(p, v)
-
         return forces_out
 
     def _BodyForces(self, i: int):
