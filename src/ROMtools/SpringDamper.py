@@ -1,8 +1,10 @@
 import numpy as np
 from math import cos, sin
+
+from ROMtools.RigidBody import RigidBody
 from .RigidBody import *
 import time
-from typing import Tuple, Optional
+from typing import Tuple, Optional,Literal
 
 
 class SpringDamper:
@@ -173,6 +175,22 @@ class SpringDamper:
 
 class LinearSpringDamper(SpringDamper):
 
+    def __init__(
+        self,
+        k: float,
+        c: float,
+        p: float = 0,
+        parent: RigidBody | None = None,
+        child: RigidBody | None = None,
+        parent_pos: Tuple[float] = (0, 0),
+        child_pos: Tuple[float] = (0, 0),
+        dof_constraint: Tuple[bool] = (False, False, False),
+        type: Literal["Linear", "Tensile", "Compressive"] = "Linear"
+    ) -> None:
+        
+        super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint)
+        self.type = type
+
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
         forces = np.zeros(p.shape)
 
@@ -185,17 +203,37 @@ class LinearSpringDamper(SpringDamper):
         r_rely = rpy - rcy
 
         disp_mag = np.linalg.norm([r_relx, r_rely])
-        stretch = disp_mag + self.p - self.l0
+        
         if disp_mag > 0.0:
             unit_vec = np.array([r_relx, r_rely]) / disp_mag
-
-            force_mag = self.k * stretch
-            F_kx = force_mag * unit_vec[0]
-            F_ky = force_mag * unit_vec[1]
+            stretch = disp_mag + self.p - self.l0
         else:
-            force_mag = 0
-            F_kx = 0
-            F_ky = 0
+            stretch = 0.0
+            unit_vec = np.array([0.0,0.0])
+
+        match self.type:
+            case "Linear":
+                force_mag = self.k * stretch
+                F_kx = force_mag * unit_vec[0]
+                F_ky = force_mag * unit_vec[1]
+            case "Tensile":
+                if stretch >= 0.0:
+                    force_mag = self.k * stretch
+                else:
+                    force_mag = 0.0
+                
+                F_kx = force_mag * unit_vec[0]
+                F_ky = force_mag * unit_vec[1]
+            case "Compressive":
+                if stretch <= 0.0:
+                    force_mag = self.k * stretch
+                else:
+                    force_mag = 0.0
+                
+                F_kx = force_mag * unit_vec[0]
+                F_ky = force_mag * unit_vec[1]
+
+
 
         # print(rpx, rpy, rcx, rcy, vpx, vpy, vcx, vcy)
         # time.sleep(0.1)
@@ -231,17 +269,17 @@ class LinearSpringDamper(SpringDamper):
 
         if self.parent >= 0:
 
-            forces[3 * self.parent] = (F_kx + F_cx) * (1 - self.constraint[0])
-            forces[3 * self.parent + 1] = (F_ky + F_cy) * (1 - self.constraint[1])
-            forces[3 * self.parent + 2] = (T_pk + T_pC) * (1 - self.constraint[2])
+            forces[3 * self.parent] = (-F_kx - F_cx) * (1 - self.constraint[0])
+            forces[3 * self.parent + 1] = (-F_ky - F_cy) * (1 - self.constraint[1])
+            forces[3 * self.parent + 2] = (-T_pk - T_pC) * (1 - self.constraint[2])
 
         if self.child >= 0:
 
-            forces[3 * self.child] = (-F_kx - F_cx) * (1 - self.constraint[0])
-            forces[3 * self.child + 1] = (-F_ky - F_cy) * (1 - self.constraint[1])
-            forces[3 * self.child + 2] = (-T_ck - T_cC) * (1 - self.constraint[2])
+            forces[3 * self.child] = (F_kx + F_cx) * (1 - self.constraint[0])
+            forces[3 * self.child + 1] = (F_ky + F_cy) * (1 - self.constraint[1])
+            forces[3 * self.child + 2] = (T_ck + T_cC) * (1 - self.constraint[2])
 
-        return -forces
+        return forces
 
 
 class RotationalSpringDamper(SpringDamper):
