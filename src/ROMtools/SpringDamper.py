@@ -244,7 +244,10 @@ class LinearSpringDamper(SpringDamper):
                 F_ky = force_mag * unit_vec[1]
 
             case "Tabular":
-                force_mag = np.interp(stretch,self.curve[:,0],self.curve[:,1])
+                force_mag = np.interp(abs(stretch),self.curve[:,0],self.curve[:,1])
+                if stretch < 0:
+                    force_mag = -1* force_mag
+                
                 F_kx = force_mag * unit_vec[0]
                 F_ky = force_mag * unit_vec[1]
 
