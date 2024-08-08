@@ -1,10 +1,10 @@
 import numpy as np
-from typing import Literal, Callable
+from typing import Literal, Callable, List, Union
 from.Configuration import RunConfiguration
 
 class Force:
 
-    def __init__(self, config:RunConfiguration, f:float | np.ndarray | Callable[[np.ndarray],np.ndarray], body:list[int] | int, dof:Literal[0,1,2], *args, **kwargs) -> None:
+    def __init__(self, config:RunConfiguration, f:Union[float, np.ndarray, Callable[[np.ndarray],np.ndarray]], body:Union[List[int], int], dof:Literal[0,1,2], *args, **kwargs) -> None:
         self.bodies = np.array(body)
         self.dof = 3*self.bodies + dof
         self.t=np.linspace(0,config.termination_time,config.n_timesteps)

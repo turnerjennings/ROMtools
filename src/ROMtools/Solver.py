@@ -5,10 +5,11 @@ from .Configuration import *
 from .Force import Force
 from time import time
 import warnings
+from typing import List
 
 class Solver():
 
-    def __init__(self, bodies:list[RigidBody],springs:list[SpringDamper], config:RunConfiguration, forces:list[Force] = None) -> None:
+    def __init__(self, bodies:List[RigidBody],springs:List[SpringDamper], config:RunConfiguration, forces:List[Force] = None) -> None:
         self.config = config
         
         self.bodies = bodies
@@ -70,7 +71,7 @@ class Solver():
             
             if np.sum(pcheck) > 0:
                 fail = i
-                warnings.warn("WARNING: NaN values calculated at timestep {i}, terminating simulation")
+                warnings.warn(f"WARNING: NaN values calculated at timestep {i}, terminating simulation")
                 np.nan_to_num(self.position_array, nan=0.0)
                 np.nan_to_num(self.velocity_array, nan=0.0)
                 np.nan_to_num(self.acceleration_array, nan=0.0)
@@ -165,40 +166,21 @@ class Solver():
         self.global_force_array[i+1, :] = self._SpringForces(p0,v0,self.timesteps[i], i)
         self.acceleration_array[i+1, :] = np.divide(self._SpringForces(p0,v0,self.timesteps[i], i),self.m)
         self.velocity_array[i+1, :] = v0 + h*np.divide(self._SpringForces(p0,v0,self.timesteps[i], i),self.m)
-        self.position_array[i+1, :] = p0 + h*v0 + 0.5*h**2*np.divide(self._SpringForces(p0,v0,self.timesteps[i], i),self.m)
+        self.position_array[i+1, :] = p0 + h*v0
         self.position_array[i+1, self.constraint] = self.position_array[0, self.constraint]
 
     
     def _CentralDifference(self,i:int, alpha:float, tolerance:float = 1e-2, maxiter:int = 100):
         h=self.dt
 
-        print(f"timestep {i}")
-
         p0 = self.position_array[i,:]
         v0 = self.velocity_array[i,:]
-        a0 = self.acceleration_array[i,:]
 
-        if i == 0:
-            p_minus_one = p0-h*v0 - 0.5*h**2*a0
-        else:
-            p_minus_one = self.position_array[i-1,:]
-
-        tol = 1
-        iter = 0
-
-        while tol > tolerance:
-
-            self.position_array[i+1,:] = ((h**2)/self.m)*self._SpringForces(p0,v0,self.timesteps[i],i) + 2*p0 - p_minus_one
-            self.position_array[i+1, self.constraint] = self.position_array[0, self.constraint]
-            vguess = 1/(2*h) * (self.position_array[i+1] - p_minus_one)
-            v0 = v0 + alpha * vguess
-            tol = np.sum(v0-vguess)**2
-
-            print(f"Convergence error: {tol}")
-
-            iter += 1
-            if iter >= maxiter:
-                raise TimeoutError(f"Convergence not reached on timestep {i}...")
+        self.global_force_array[i+1, :] = self._SpringForces(p0,v0,self.timesteps[i], i)
+        self.acceleration_array[i+1, :] = np.divide(self._SpringForces(p0,v0,self.timesteps[i], i),self.m)
+        self.velocity_array[i+1, :] = v0 + h*np.divide(self._SpringForces(p0,v0,self.timesteps[i], i),self.m)
+        self.position_array[i+1, :] = p0 + h*v0 + 0.5*h**2*np.divide(self._SpringForces(p0,v0,self.timesteps[i], i),self.m)
+        self.position_array[i+1, self.constraint] = self.position_array[0, self.constraint]
 
 
 

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import json
+from typing import List, Dict, Any
 
 @dataclass
 class RunConfiguration:
@@ -29,14 +30,14 @@ class RunConfiguration:
     #Animation settings
     render_name: str = output_name
     animate_concise:bool = False
-    bodies_to_render: list[int] = None
-    body_colors: list[str] = None
+    bodies_to_render: List[int] = None
+    body_colors: List[str] = None
     n_frames: int = 100
     
     
     
     
-    def update_from_dict(self, config_dict: dict[str, any]) -> None:
+    def update_from_dict(self, config_dict: Dict[str, Any]) -> None:
         for key, value in config_dict.items():
             if hasattr(self, key):
                 setattr(self, key, value)

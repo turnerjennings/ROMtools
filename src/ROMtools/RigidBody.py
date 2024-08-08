@@ -30,7 +30,7 @@ class RigidBody():
     def __str__(self) -> str:
         return f"Rigid body {self.ID}:\n\tMass: {self.m}\n\tInertia: {self.I}\n\tCOM: ({self.x0}, {self.y0})"
     
-    def initial_conditions(self, p:tuple[float, float, float]=(0.0, 0.0, 0.0), v:tuple[float, float, float]=(0.0, 0.0, 0.0), a:tuple[float, float, float]=(0.0, 0.0, 0.0)):
+    def initial_conditions(self, p:Tuple[float, float, float]=(0.0, 0.0, 0.0), v:Tuple[float, float, float]=(0.0, 0.0, 0.0), a:Tuple[float, float, float]=(0.0, 0.0, 0.0)):
         self.p0 = (p[0] + self.x0, p[1] + self.y0, p[2] + self.t0)
         self.v0 = v
         self.a0 = a

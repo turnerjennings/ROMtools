@@ -7,59 +7,70 @@ src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 sys.path.append(src_path)
 
-from rom_rbd import *
+from ROMtools import *
 
-body1=Disc(0, 1, 1, cm=(0.0,1.0, 0.0),name="body1")
-body1.initial_conditions(p=(0.0,0.0,0.0))
+body1=Disc(0, 1, 1, cm=(0.0,1.0, 0.0),name="mass")
+body1.initial_conditions(p=(0.0,0.1,0.0))
 
-body2 = Disc(1, 2, 1, cm = (1.0, 0.0, 0.0), name="body2")
-
-spring1 = RotationalSpringDamper(100,1,body1)
-spring2 = LinearSpringDamper(100,1,body1)
+spring1 = LinearSpringDamper(100,0,0,body1,child=None,child_pos=(0,0))
 
 
 
 
 config = RunConfiguration()
 config.update_from_dict({
+    "output_path":"T:/codes/ROMtools/scripts/",
     "output_name":"RK4",
     "n_timesteps": 10000,
-    "termination_time":2
+    "termination_time":0.5
+
 })
 
-def sinforce(t:np.ndarray,a:float,w:float)->np.ndarray:
-    return a*np.sin(w*t)
+config_FE = RunConfiguration()
+config_FE.update_from_dict({
+    "output_path":"T:/codes/ROMtools/scripts/",
+    "output_name":"1dof",
+    "solver_type": "FwdEuler",
+    "n_timesteps": 10000,
+    "termination_time":0.5
+})
 
-f1 = Force(config, sinforce, 0, 1,a=1.0,w=10.0)
-solver_RK = Solver([body1], [spring2], config=config, forces=[f1])
+config_CD = RunConfiguration()
+config_CD.update_from_dict({
+    "output_path":"T:/codes/ROMtools/scripts/",
+    "output_name":"1dof",
+    "solver_type": "CentralDifference",
+    "n_timesteps": 10000,
+    "termination_time":0.5
+})
 
+
+solver_RK = Solver([body1], [spring1], config=config)
 solver_RK.Solve()
 
-anim = Animator(solver_RK)
-anim.animate()
+solver_FE = Solver([body1], [spring1], config=config_FE)
+solver_FE.Solve()
+
+solver_CD = Solver([body1], [spring1], config=config_CD)
+solver_CD.Solve()
+
+
 
 import matplotlib.pyplot as plt
 
 validation = 0.1*np.cos(np.sqrt(100/1)*solver_RK.timesteps)+1
 
-fig, ax = plt.subplots(2,1)
+fig, ax = plt.subplots(1,1)
 
-ax[0]=plt.subplot(2,1,1)
-ax[0].plot(solver_RK.timesteps,validation, label = "analytical")
-ax[0].plot(solver_RK.timesteps,solver_RK.position_array[:,1], label = "RK4")
-ax[0].legend()
+ax=plt.subplot(1,1,1)
+ax.plot(solver_RK.timesteps,validation, label = "analytical")
+ax.plot(solver_RK.timesteps,solver_RK.position_array[:,1], label = "RK4")
+ax.plot(solver_FE.timesteps,solver_FE.position_array[:,1], label = "FwdEuler")
+ax.plot(solver_CD.timesteps,solver_CD.position_array[:,1], label = "CenDif")
+ax.legend()
 
-fft1 = fftshift(fft(solver_RK.position_array[:,1]))
-fft2 = fftshift(fft(validation))
 
-freq = fftshift(fftfreq(solver_RK.n_timesteps))/solver_RK.dt
 
-ax[1]=plt.subplot(2,1,2)
-ax[1].plot(freq, fft2, label = "analytical")
-ax[1].plot(freq, fft1, label = "RK4")
-ax[1].legend()
-ax[1].set_xlim(0,12)
-
-#plt.show()
+plt.show()
 
 

@@ -25,9 +25,9 @@ class SpringDamper():
             self.xc = child_pos[0]
             self.yc = child_pos[1]
         
-        self.k = k
-        self.c = c
-        self.p = p
+        self.k = float(k)
+        self.c = float(c)
+        self.p = float(p)
 
         self.constraint=dof_constraint
 
