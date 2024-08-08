@@ -2,9 +2,12 @@ from dataclasses import dataclass
 import json
 from typing import List, Dict, Any
 
+
 @dataclass
 class RunConfiguration:
-    #output settings
+    """Object to store configuration information for a solver run"""
+
+    # output settings
     output_path: str = "T:/codes/ROM_rbd/scripts/"
     output_name: str = "run"
 
@@ -14,43 +17,39 @@ class RunConfiguration:
     output_velocity: bool = True
     output_acceleration: bool = True
     output_force: bool = True
-    
-    #general settings
+
+    # general settings
     solver_type: str = "RK4"
     output_frequency: int = 10
 
-
-    #timing information
+    # timing information
     termination_time: float = 1.0
     n_timesteps: int = 1000
 
-    #time integration settings
+    # time integration settings
     alpha: float = 0.1
 
-    #Animation settings
+    # Animation settings
     render_name: str = output_name
-    animate_concise:bool = False
+    animate_concise: bool = False
     bodies_to_render: List[int] = None
     body_colors: List[str] = None
     n_frames: int = 100
-    
-    
-    
-    
+
     def update_from_dict(self, config_dict: Dict[str, Any]) -> None:
         for key, value in config_dict.items():
             if hasattr(self, key):
                 setattr(self, key, value)
             else:
                 raise KeyError(f"Invalid configuration key: {key}")
-            
+
     def save_to_file(self, filename: str) -> None:
-        with open(filename, 'w') as file:
+        with open(filename, "w") as file:
             json.dump(self.__dict__, file, indent=4)
-    
-    @classmethod 
+
+    @classmethod
     def load_from_file(cls, filename: str) -> "RunConfiguration":
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             config_dict = json.load(file)
         config = cls()
         config.update_from_dict(config_dict)
