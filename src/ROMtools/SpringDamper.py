@@ -198,7 +198,7 @@ class LinearSpringDamper(SpringDamper):
             else:
                 raise ValueError("Input argument Curve required for tabular spring type")
         else:
-            self.curve = None
+            self.kcurve = None
                 
 
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
@@ -244,7 +244,7 @@ class LinearSpringDamper(SpringDamper):
                 F_ky = force_mag * unit_vec[1]
 
             case "Tabular":
-                force_mag = np.interp(abs(stretch),self.curve[:,0],self.curve[:,1])
+                force_mag = np.interp(abs(stretch),self.kcurve[:,0],self.kcurve[:,1])
                 if stretch < 0:
                     force_mag = -1* force_mag
                 
