@@ -51,7 +51,7 @@ class SpringDamper:
             x0p = (
                 parent.x0
                 + parent_pos[0] * cos(parent.t0)
-                - parent_pos[0] * sin(parent.t0)
+                + parent_pos[0] * sin(parent.t0)
             )
             y0p = (
                 parent.y0
@@ -64,7 +64,7 @@ class SpringDamper:
             t0p = 0.0
 
         if child is not None:
-            x0c = child.x0 + child_pos[0] * cos(child.t0) - child_pos[0] * sin(child.t0)
+            x0c = child.x0 + child_pos[0] * cos(child.t0) + child_pos[0] * sin(child.t0)
             y0c = child.y0 + child_pos[1] * cos(child.t0) + child_pos[1] * sin(child.t0)
             t0c = child.t0
         else:
@@ -93,73 +93,92 @@ class SpringDamper:
     ) -> Tuple[float, float, float, float]:
         # define variables from dof for convenience
 
-
-        #load position info
-        parent_p = np.array([self.xp, self.yp]).reshape((2,1))
-        child_p = np.array([self.xp, self.yp]).reshape((2,1))
-
-
-
-        if self.parent >= 0:
-            parent_x = p[3 * self.parent:3 * self.parent + 2].reshape((2,1))
-            theta = p[3 * self.parent + 2]
-            parent_R = np.array([[cos(theta), -sin(theta)],[sin(theta), cos(theta)]])
-
-
-        else:
-            parent_x = np.zeros(2)
-            parent_R = np.eye(2)
-
-
-        if self.child >= 0:
-
-            child_x = p[3 * self.child:3 * self.child + 2].reshape((2,1))
-            theta = p[3 * self.child + 2]
-            parent_R = np.array([[cos(theta), -sin(theta)],[sin(theta), cos(theta)]])
-
-        else:
-            child_x = np.zeros(2).reshape((2,1))
-            child_R = np.eye(2)
-
-        #load velocity info
-        parent_dx = np.array([0.0,0.0]).reshape((2,1))
-        parent_w = np.zeros((2,2))
-
-        child_dx = np.array([0.0,0.0]).reshape((2,1))
-        child_w = np.zeros((2,2))
-        
         if v is not None:
             if self.parent >= 0:
+                parent_x = p[3 * self.parent]
+                parent_y = p[3 * self.parent + 1]
+                parent_t = p[3 * self.parent + 2]
 
-                parent_dx = v[3 * self.parent:3 * self.parent + 2].reshape((2,1))
-                wz = v[3 * self.parent + 2]
-                parent_w = np.array([[0,-wz],[wz,0]])
+                parent_dx = v[3 * self.parent]
+                parent_dy = v[3 * self.parent + 1]
+                parent_dt = v[3 * self.parent + 2]
+            else:
+                parent_x = self.xp
+                parent_y = self.yp
+                parent_t = 0.0
+
+                parent_dx = 0.0
+                parent_dy = 0.0
+                parent_dt = 0.0
 
             if self.child >= 0:
+                child_x = p[3 * self.child]
+                child_y = p[3 * self.child + 1]
+                child_t = p[3 * self.child + 2]
 
-                child_dx = v[3 * self.child:3 * self.child + 2].reshape((2,1))
-                wz = v[3 * self.child + 2]
-                child_w = np.array([[0,-wz],[wz,0]])
+                child_dx = v[3 * self.child]
+                child_dy = v[3 * self.child + 1]
+                child_dt = v[3 * self.child + 2]
+            else:
+                child_x = self.xc
+                child_y = self.yc
+                child_t = 0.0
 
-        #calculate position
-        
-        #moment arms
-        arm_p =  parent_R@parent_p
-        arm_c = child_R@child_p
-        #positions        
-        r_p = arm_p + parent_x   
-        r_c = arm_c + child_x  
+                child_dx = 0.0
+                child_dy = 0.0
+                child_dt = 0.0
+            vpx = parent_dx + parent_dt * (
+                -self.xp * sin(parent_t) + self.yp * cos(parent_t)
+            )
+            vpy = parent_dy + parent_dt * (
+                -self.yp * sin(parent_t) + self.xp * cos(parent_t)
+            )
 
-        #calculate velocities
-        v_p = parent_w@parent_R@parent_p+parent_dx
-        v_c = child_w@child_R@child_p+child_dx
+            vcx = child_dx + child_dt * (
+                -self.xc * sin(child_t) + self.yc * cos(child_t)
+            )
+            vcy = child_dy + child_dt * (
+                -self.yc * sin(child_t) + self.xc * cos(child_t)
+            )
 
+        else:
+            if self.parent >= 0:
+                parent_x = p[3 * self.parent]
+                parent_y = p[3 * self.parent + 1]
+                parent_t = p[3 * self.parent + 2]
 
+            else:
+                parent_x = 0.0
+                parent_y = 0.0
+                parent_t = 0.0
+
+            if self.child >= 0:
+                child_x = p[3 * self.child]
+                child_y = p[3 * self.child + 1]
+                child_t = p[3 * self.child + 2]
+            else:
+                child_x = 0.0
+                child_y = 0.0
+                child_t = 0.0
+
+        # calculate parent and child relative positions
+        rpx = parent_x + self.xp * cos(parent_t) - self.yp * sin(parent_t)
+        rpy = parent_y + self.yp * cos(parent_t) + self.xp * sin(parent_t)
+
+        rcx = child_x + self.xc * cos(child_t) - self.yc * sin(child_t)
+        rcy = child_y + self.yc * cos(child_t) + self.xc * sin(child_t)
+
+        # calculate torque moment arms
+        armpx = rpx - parent_x
+        armpy = rpy - parent_y
+
+        armcx = rcx - child_x
+        armcy = rcy - child_y
 
         if v is not None:
-            return r_p, r_c, arm_p, arm_c, v_p, v_c
+            return rpx, rpy, rcx, rcy, armpx, armpy, armcx, armcy, vpx, vpy, vcx, vcy
         else:
-            return r_p, r_c, arm_p, arm_c,
+            return rpx, rpy, rcx, rcy, armpx, armpy, armcx, armcy
 
 
 class LinearSpringDamper(SpringDamper):
@@ -195,84 +214,92 @@ class LinearSpringDamper(SpringDamper):
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
         forces = np.zeros(p.shape)
 
-        r_p, r_c, arm_p, arm_c, v_p, v_c = self._RelativePos(p,v)
+        rpx, rpy, rcx, rcy, armpx, armpy, armcx, armcy, vpx, vpy, vcx, vcy = (
+            self._RelativePos(p, v)
+        )
 
         # compute relative displacement from relative position and initial lengths
-        r_rel = r_p - r_c
+        r_relx = rpx - rcx
+        r_rely = rpy - rcy
 
-        disp_mag = np.linalg.norm(r_rel)
+        disp_mag = np.linalg.norm([r_relx, r_rely])
 
         if disp_mag > 0.0:
-            unit_vec = r_rel / disp_mag
+            unit_vec = np.array([r_relx, r_rely]) / disp_mag
             stretch = disp_mag + self.p - self.l0
         else:
             stretch = 0.0
             unit_vec = np.array([0.0, 0.0])
 
-
         
         # calculate force depending on type
         if self.type == "Linear":
             force_mag = self.k * stretch
-            F_k = force_mag * unit_vec
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
         elif self.type == "Tensile":
             if stretch >= 0.0:
                 force_mag = self.k * stretch
             else:
                 force_mag = 0.0
 
-            F_k = force_mag * unit_vec
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
         elif self.type == "Compressive":
             if stretch <= 0.0:
                 force_mag = self.k * stretch
             else:
                 force_mag = 0.0
 
-            F_k = force_mag * unit_vec
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
 
         elif self.type == "Tabular":
             force_mag = np.interp(abs(stretch), self.kcurve[:, 0], self.kcurve[:, 1])
             if stretch < 0:
                 force_mag = -1 * force_mag
 
-            F_k = force_mag * unit_vec
+            F_kx = force_mag * unit_vec[0]
+            F_ky = force_mag * unit_vec[1]
 
         # print(rpx, rpy, rcx, rcy, vpx, vpy, vcx, vcy)
         # time.sleep(0.1)
 
         # calculate torque moment arms
 
-        T_pk = np.cross(arm_p.reshape(2,),F_k.reshape(2,))
-        T_ck = np.cross(arm_c.reshape(2,),F_k.reshape(2,))
+        T_pk = armpx * F_ky - armpy * F_kx
+        T_ck = armcx * F_ky - armcy * F_kx
 
         # calculate parent and child relative velocities
 
         # compute relative displacement from relative position and initial lengths
-        v_rel = v_p - v_c
+        v_relx = vpx - vcx
+        v_rely = vpy - vcy
 
-        vel_mag = np.linalg.norm(v_rel)
+        vel_mag = np.linalg.norm([v_relx, v_rely])
 
         if vel_mag > 0:
 
-            unit_vec = v_rel / vel_mag
+            unit_vec = np.array([v_relx, v_rely]) / vel_mag
 
             damp_mag = self.c * vel_mag
+
+            F_cx = damp_mag * unit_vec[0]
+            F_cy = damp_mag * unit_vec[1]
         else:
             damp_mag = 0
-        
-        
-        F_c = damp_mag * unit_vec
+            F_cx = 0
+            F_cy = 0
 
-
-        T_pC = np.cross(arm_p.reshape(2,),F_c.reshape(2,))
-        T_cC = np.cross(arm_c.reshape(2,),F_c.reshape(2,))
+        T_pC = armpx * F_cy - armpy * F_cx
+        T_cC = armcx * F_cy - armcy * F_cx
 
         
         #calculate force balance and update force array
-        F_totx = F_k[0] + F_c[0]
-        F_toty = F_k[1] + F_c[1]
+        F_totx = F_kx + F_cx
+        F_toty = F_ky + F_cy
         T_totp = T_pk + T_pC
-        T_totc = T_ck + T_cC
+        t_totc = T_ck + T_cC
         
         
         if self.parent >= 0:
@@ -285,7 +312,7 @@ class LinearSpringDamper(SpringDamper):
 
             forces[3 * self.child] = (F_totx) * (1 - self.constraint[0])
             forces[3 * self.child + 1] = (F_toty) * (1 - self.constraint[1])
-            forces[3 * self.child + 2] = (T_totc) * (1 - self.constraint[2])
+            forces[3 * self.child + 2] = (t_totc) * (1 - self.constraint[2])
 
         return forces
 
