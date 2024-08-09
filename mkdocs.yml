@@ -1,0 +1,16 @@
+site_name: ROMtools
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
+    - toc.integrate
+nav:
+  - Overview: index.md
+  - Rigid Bodies: RigidBody.md
+  - Springs and Dampers: SpringDamper.md
+  - External Forces: Forces.md
+  - Solver: Solver.md
+  - Animation: Animation.md

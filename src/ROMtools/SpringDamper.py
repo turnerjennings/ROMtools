@@ -19,6 +19,7 @@ class SpringDamper:
         parent_pos: Tuple[float, float] = (0.0, 0.0),
         child_pos: Tuple[float, float] = (0.0, 0.0),
         dof_constraint: Tuple[bool, bool, bool] = (False, False, False),
+        track_force:bool = False,
     ) -> None:
         if parent is not None:
             self.parent = parent.ID
@@ -76,6 +77,13 @@ class SpringDamper:
 
         self.l0 = np.linalg.norm([self.lx0, self.ly0])
         self.l0t = t0p - t0c
+
+        #force tracking
+        if track_force == True:
+            self.forcehist = []
+        else:
+            self.forcehist= None
+
 
     def calculate_force(self):
         raise RuntimeError("No force calculation defined for generic spring element")
@@ -185,11 +193,12 @@ class LinearSpringDamper(SpringDamper):
         parent_pos: Tuple[float] = (0, 0),
         child_pos: Tuple[float] = (0, 0),
         dof_constraint: Tuple[bool] = (False, False, False),
+        track_force:bool = False,
         type: Literal["Linear", "Tensile", "Compressive", "Tabular"] = "Linear",
         curve: np.ndarray = None,
     ) -> None:
 
-        super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint)
+        super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint, track_force)
         self.type = type
 
         if self.type == "Tabular":
@@ -222,6 +231,8 @@ class LinearSpringDamper(SpringDamper):
             stretch = 0.0
             unit_vec = np.array([0.0, 0.0])
 
+        
+        # calculate force depending on type
         if self.type == "Linear":
             force_mag = self.k * stretch
             F_kx = force_mag * unit_vec[0]
@@ -283,17 +294,25 @@ class LinearSpringDamper(SpringDamper):
         T_pC = armpx * F_cy - armpy * F_cx
         T_cC = armcx * F_cy - armcy * F_cx
 
+        
+        #calculate force balance and update force array
+        F_totx = F_kx + F_cx
+        F_toty = F_ky + F_cy
+        T_totp = T_pk + T_pC
+        t_totc = T_ck + T_cC
+        
+        
         if self.parent >= 0:
 
-            forces[3 * self.parent] = (-F_kx - F_cx) * (1 - self.constraint[0])
-            forces[3 * self.parent + 1] = (-F_ky - F_cy) * (1 - self.constraint[1])
-            forces[3 * self.parent + 2] = (-T_pk - T_pC) * (1 - self.constraint[2])
+            forces[3 * self.parent] = (-F_totx) * (1 - self.constraint[0])
+            forces[3 * self.parent + 1] = (-F_toty) * (1 - self.constraint[1])
+            forces[3 * self.parent + 2] = (T_totp) * (1 - self.constraint[2])
 
         if self.child >= 0:
 
-            forces[3 * self.child] = (F_kx + F_cx) * (1 - self.constraint[0])
-            forces[3 * self.child + 1] = (F_ky + F_cy) * (1 - self.constraint[1])
-            forces[3 * self.child + 2] = (T_ck + T_cC) * (1 - self.constraint[2])
+            forces[3 * self.child] = (F_totx) * (1 - self.constraint[0])
+            forces[3 * self.child + 1] = (F_toty) * (1 - self.constraint[1])
+            forces[3 * self.child + 2] = (t_totc) * (1 - self.constraint[2])
 
         return forces
 
@@ -310,11 +329,12 @@ class RotationalSpringDamper(SpringDamper):
         parent_pos: Tuple[float] = (0, 0),
         child_pos: Tuple[float] = (0, 0),
         dof_constraint: Tuple[bool] = (False, False, False),
+        track_force:bool = False,
         type: Literal["Linear","Linked"] = "Linear",
         link: Optional[LinearSpringDamper] = None,
         linkcoef: Tuple[float] = (1,1)
     ) -> None:
-        super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint)
+        super().__init__(k, c, p, parent, child, parent_pos, child_pos, dof_constraint,track_force)
 
         self.type = type
         if self.type == "Linked":
@@ -359,8 +379,9 @@ class RotationalSpringDamper(SpringDamper):
             T_k =  forcemag*self.linkingcoef[0] * (parent_t - child_t + self.p - self.l0t)
             T_c =  forcemag*self.linkingcoef[0] * (parent_dt - child_dt)
 
+        T_tot = T_k + T_c
 
-        forces[3 * self.parent + 2] = -T_k - T_c
-        forces[3 * self.child + 2] = T_k + T_c
+        forces[3 * self.parent + 2] = -T_tot
+        forces[3 * self.child + 2] = T_tot
 
         return forces

@@ -101,6 +101,10 @@ class Solver:
 
                 break
 
+        for s in self.springs:
+            if s.forcehist is not None:
+                s.forcehist = np.array(s.forcehist)
+
         self._SaveData()
         end_time = time()
         if fail > 0:
@@ -163,11 +167,32 @@ class Solver:
                 np.save(output_path + "_force.npy", self.global_force_array)
 
     def _SpringForces(
-        self, p: np.ndarray, v: np.ndarray, t: float, t_idx: float
+        self,
+        p: np.ndarray,
+        v: np.ndarray,
+        t: float,
+        t_idx: float,
+        save_hist: bool = False,
     ) -> np.ndarray:
         forces_out = np.empty(p.shape)
+
         for spring in self.springs:
-            forces_out += spring.calculate_force(p, v)
+            spring_force = spring.calculate_force(p, v)
+
+            forces_out += spring_force
+
+            # update spring force history if requested
+            if save_hist == True:
+                if spring.forcehist is not None:
+                    spring.forcehist.append(
+                        [
+                            spring_force[3 * spring.parent],
+                            spring_force[3 * spring.parent + 1],
+                            spring_force[3 * spring.parent + 2],
+                            spring_force[3 * spring.child + 2],
+                        ]
+                    )
+
         return forces_out
 
     def _BodyForces(self, i: int):
@@ -185,11 +210,11 @@ class Solver:
         p0 = self.position_array[i, :]
         v0 = self.velocity_array[i, :]
 
-        self.global_force_array[i + 1, :] = self._SpringForces(
-            p0, v0, self.timesteps[i], i
-        ) + self._BodyForces(i)
+        F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
 
-        k1 = np.divide(self._SpringForces(p0, v0, self.timesteps[i], i), self.m)
+        self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
+
+        k1 = np.divide(F_next, self.m)
         k2 = np.divide(
             self._SpringForces(
                 p0 + 0.5 * h * v0 + (h**2) / 8 * k1,
@@ -231,9 +256,9 @@ class Solver:
         p0 = self.position_array[i, :]
         v0 = self.velocity_array[i, :]
 
-        self.global_force_array[i + 1, :] = self._SpringForces(
-            p0, v0, self.timesteps[i], i
-        )
+        F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
+
+        self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
         self.acceleration_array[i + 1, :] = np.divide(
             self._SpringForces(p0, v0, self.timesteps[i], i), self.m
         )
@@ -253,9 +278,10 @@ class Solver:
         p0 = self.position_array[i, :]
         v0 = self.velocity_array[i, :]
 
-        self.global_force_array[i + 1, :] = self._SpringForces(
-            p0, v0, self.timesteps[i], i
-        )
+        F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
+
+        self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
+
         self.acceleration_array[i + 1, :] = np.divide(
             self._SpringForces(p0, v0, self.timesteps[i], i), self.m
         )

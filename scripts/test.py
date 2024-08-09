@@ -9,12 +9,12 @@ sys.path.append(src_path)
 
 from ROMtools import *
 
-body1=Disc(0, 1, 1, cm=(0.0,1.0, 0.0),name="mass")
+body1=Ellipsoid(0, 1,a = 2, b = 1.5, cm=(0.0,1.0, 0.0),name="mass")
 body1.initial_conditions(p=(0.0,0.1,0.0))
 
 springstiffness = np.array([[0,0],[0.05,100],[0.1,10]])
 
-spring1 = LinearSpringDamper(100,0,0,body1,child=None,child_pos=(0,0),type = "Tabular",curve=springstiffness)
+spring1 = LinearSpringDamper(100,0,0,body1,child=None,child_pos=(0,0),type = "Linear",track_force=True)
 
 
 
@@ -49,13 +49,9 @@ config_CD.update_from_dict({
 solver_RK = Solver([body1], [spring1], config=config)
 solver_RK.Solve()
 
-solver_FE = Solver([body1], [spring1], config=config_FE)
-solver_FE.Solve()
 
-
-
-solver_CD = Solver([body1], [spring1], config=config_CD)
-solver_CD.Solve()
+anim = Animator(solver_RK)
+anim.animate()
 
 
 

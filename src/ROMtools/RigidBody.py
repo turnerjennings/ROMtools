@@ -149,3 +149,44 @@ class circle(RigidBody):
             ax.plot(head_points_x, head_points_y, color=color)
 
         ax.plot(angle_line_x, angle_line_y, color="black", alpha=0.5)
+
+
+class Ellipsoid(RigidBody):
+
+    def __init__(
+        self,
+        ID: int,
+        m: float,
+        a: float,
+        b: float,
+        name: str = "",
+        cm: Tuple[float, float, float] = (0, 0, 0),
+        I: Optional[float] = None,
+        dof_constraint: Tuple[bool, bool, bool] = (False, False, False),
+    ) -> None:
+        R= 0.5*(a+b)
+        self.a = a
+        self.b = b
+        super().__init__(ID, m, R, name, cm, I, dof_constraint)
+
+
+    def _inertia(self):
+        return 0.2*self.m*(self.a**2 + self.b**2)
+
+    def render_body(self, ax: Axes, p: np.ndarray, color: str = "green"):
+        xcen = p[0]
+        ycen = p[1]
+        theta = p[2]
+
+        theta_array = np.linspace(0, 2 * pi, 51)
+        head_points_x = xcen + self.a* np.cos(theta + theta_array)
+        head_points_y = ycen + self.b * np.sin(theta + theta_array)
+
+        angle_line_x = np.array([head_points_x[0], head_points_x[25]])
+        angle_line_y = np.array([head_points_y[0], head_points_y[25]])
+        if self.name is not None:
+            ax.plot(head_points_x, head_points_y, color=color, label=self.name)
+        else:
+            ax.plot(head_points_x, head_points_y, color=color)
+
+        ax.plot(angle_line_x, angle_line_y, color="black", alpha=0.5)
