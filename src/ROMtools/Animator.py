@@ -154,8 +154,10 @@ class Animator:
 
                 for j, spring in enumerate(self.springs):
                     if type(spring) == LinearSpringDamper:
-                        xp, yp, xc, yc, _, _, _, _ = spring._RelativePos(self.pos[i, :])
-                        ax.plot(np.array([xp, xc]), np.array([yp, yc]), color="red")
+                        r_p, r_c, _,_ = spring._RelativePos(self.pos[i, :])
+                        ax.plot(
+                            np.array([r_p[0], r_c[0]]), np.array([r_p[1], r_c[1]]), color="red"
+                        )
 
                 ax.set_xlim(self.xlim[0], self.xlim[1])
                 ax.set_ylim(self.ylim[0], self.ylim[1])
@@ -247,9 +249,9 @@ class Animator:
 
                 for j, spring in enumerate(self.springs):
                     if type(spring) == LinearSpringDamper:
-                        xp, yp, xc, yc, _, _, _, _ = spring._RelativePos(self.pos[i, :])
+                        r_p, r_c, _,_ = spring._RelativePos(self.pos[i, :])
                         ax_anim.plot(
-                            np.array([xp, xc]), np.array([yp, yc]), color="red"
+                            np.array([r_p[0], r_c[0]]), np.array([r_p[1], r_c[1]]), color="red"
                         )
 
                 ax_anim.set_xlim(self.xlim[0], self.xlim[1])

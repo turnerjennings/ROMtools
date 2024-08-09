@@ -69,6 +69,10 @@ class Solver:
                 body.a0
             )
 
+
+
+
+
     def Solve(self):
         """Generate a solution for the given inputs, does not return a value but populates the solver position, velocity, acceleration, and force arrays"""
         fail = -1
@@ -101,11 +105,15 @@ class Solver:
 
                 break
 
+        #save spring force history
         for s in self.springs:
             if s.forcehist is not None:
                 s.forcehist = np.array(s.forcehist)
 
+        #write data out
         self._SaveData()
+
+        #print termination status
         end_time = time()
         if fail > 0:
             print(
@@ -114,6 +122,9 @@ class Solver:
         else:
             print(f"Solution complete, time elapsed: {end_time - start_time:.3f}")
             self.solved = True
+
+
+
 
     def _SaveData(self):
         output_path = self.config.output_path + self.config.output_name
@@ -165,6 +176,10 @@ class Solver:
                 )
             else:
                 np.save(output_path + "_force.npy", self.global_force_array)
+
+
+
+
 
     def _SpringForces(
         self,
