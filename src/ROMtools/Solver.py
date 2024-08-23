@@ -39,15 +39,20 @@ class Solver:
 
         self.solver = config.solver_type
         mass_temp = []
+        self.constraint = []
+
+        #check for contact
+        self.contact=False
+        for spring in springs:
+            if spring.contact == True:
+                self.contact=True
+
         for body in bodies:
+            #generate mass vector for body
             mass_temp.append(body.m)
             mass_temp.append(body.m)
             mass_temp.append(body.I)
-
-        self.constraint = []
-
-        for body in self.bodies:
-            self.constraint += list(body.constraint)
+            self.constraint += list(body.constraint)           
 
         self.m = np.array(mass_temp)
 
@@ -75,6 +80,7 @@ class Solver:
         print("Solving model...")
         start_time = time()
         for i in range(self.n_timesteps - 1):
+
             if self.config.solver_type == "RK4":
                 self._RK4(i)
             elif self.config.solver_type == "FwdEuler":
@@ -101,6 +107,7 @@ class Solver:
 
                 break
 
+        #update spring force history
         for s in self.springs:
             if s.forcehist is not None:
                 s.forcehist = np.array(s.forcehist)
@@ -114,6 +121,8 @@ class Solver:
         else:
             print(f"Solution complete, time elapsed: {end_time - start_time:.3f}")
             self.solved = True
+
+
 
     def _SaveData(self):
         output_path = self.config.output_path + self.config.output_name
@@ -177,21 +186,26 @@ class Solver:
         forces_out = np.empty(p.shape)
 
         for spring in self.springs:
+            #update contact point
+            if t_idx >= 1:
+                if spring.contact == True and spring.forcehist[t_idx-1:0]+spring.forcehist[t_idx-1:1] == 0:
+                    print("changing spring theta offset")
+                    spring.t_offset = p[spring.parent+2]
+
             spring_force = spring.calculate_force(p, v)
 
             forces_out += spring_force
 
             # update spring force history if requested
             if save_hist == True:
-                if spring.forcehist is not None:
-                    spring.forcehist.append(
-                        [
-                            spring_force[3 * spring.parent],
-                            spring_force[3 * spring.parent + 1],
-                            spring_force[3 * spring.parent + 2],
-                            spring_force[3 * spring.child + 2],
-                        ]
-                    )
+                spring.forcehist.append(
+                    [
+                        spring_force[3 * spring.parent],
+                        spring_force[3 * spring.parent + 1],
+                        spring_force[3 * spring.parent + 2],
+                        spring_force[3 * spring.child + 2],
+                    ]
+                )
 
         return forces_out
 

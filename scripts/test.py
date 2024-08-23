@@ -64,8 +64,6 @@ fig, ax = plt.subplots(1,1)
 ax=plt.subplot(1,1,1)
 ax.plot(solver_RK.timesteps,validation, label = "analytical")
 ax.plot(solver_RK.timesteps,solver_RK.position_array[:,1], label = "RK4")
-ax.plot(solver_FE.timesteps,solver_FE.position_array[:,1], label = "FwdEuler")
-ax.plot(solver_CD.timesteps,solver_CD.position_array[:,1], label = "CenDif")
 ax.legend()
 
 
