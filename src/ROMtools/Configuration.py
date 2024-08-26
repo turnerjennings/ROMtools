@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Literal
 
 
 @dataclass
@@ -8,7 +8,7 @@ class RunConfiguration:
     """Object to store configuration information for a solver run"""
 
     # output settings
-    output_path: str = "T:/codes/ROM_rbd/scripts/"
+    output_path: str = "C:/"
     output_name: str = "run"
 
     output_as_csv: bool = True
@@ -19,8 +19,7 @@ class RunConfiguration:
     output_force: bool = True
 
     # general settings
-    solver_type: str = "RK4"
-    output_frequency: int = 10
+    solver_type: Literal["RK4","FwdEuler","CentralDifference"] = "RK4"
 
     # timing information
     termination_time: float = 1.0

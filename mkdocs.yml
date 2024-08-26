@@ -13,6 +13,7 @@ theme:
     - toc.integrate
 nav:
   - Overview: index.md
+  - Run Configuration: RunConfiguration.md
   - Rigid Bodies: RigidBody.md
   - Springs and Dampers: SpringDamper.md
   - Boundary Conditions: Forces.md
