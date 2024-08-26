@@ -117,6 +117,7 @@ class Animator:
         writer = PillowWriter(fps=self.fps, metadata=self.metadata)
 
         fig, ax = plt.subplots(1, 1, figsize=(7, 7))
+        fig.tight_layout()
 
         ax = plt.subplot(1, 1, 1)
 

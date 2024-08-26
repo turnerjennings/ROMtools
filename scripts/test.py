@@ -14,7 +14,7 @@ body1.initial_conditions(p=(0.0,0.1,0.0))
 
 springstiffness = np.array([[0,0],[0.05,100],[0.1,10]])
 
-spring1 = LinearSpringDamper(100,0,0,body1,child=None,child_pos=(0,0),type = "Linear",track_force=True)
+spring1 = LinearSpringDamper(100,0,0,body1,child=None,child_pos=(0,0),type = "Linear")
 
 
 

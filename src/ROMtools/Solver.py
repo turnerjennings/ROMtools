@@ -3,7 +3,7 @@ from .RigidBody import *
 from .SpringDamper import *
 from .Configuration import *
 from .Force import *
-from time import time
+from time import time,sleep
 import warnings
 from typing import List
 
@@ -15,7 +15,7 @@ class Solver:
         bodies: List[RigidBody],
         springs: List[SpringDamper],
         config: RunConfiguration,
-        bcs: List[Force,Displacement] = None,
+        bcs: List[Union[Force,Displacement]] = None,
     ) -> None:
         """Class to manage the solution process and store the subsequent output data
 
@@ -183,7 +183,7 @@ class Solver:
         t_idx: float,
         save_hist: bool = False,
     ) -> np.ndarray:
-        forces_out = np.empty(p.shape)
+        forces_out = np.zeros(p.shape)
 
         for spring in self.springs:
             #update contact point
@@ -196,6 +196,7 @@ class Solver:
 
             forces_out += spring_force
 
+
             # update spring force history if requested
             if save_hist == True:
                 spring.forcehist.append(
@@ -206,7 +207,6 @@ class Solver:
                         spring_force[3 * spring.child + 2],
                     ]
                 )
-
         return forces_out
 
     
@@ -237,6 +237,7 @@ class Solver:
         self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
 
         k1 = np.divide(F_next, self.m)
+
         k2 = np.divide(
             self._SpringForces(
                 p0 + 0.5 * h * v0 + (h**2) / 8 * k1,
@@ -246,6 +247,7 @@ class Solver:
             ),
             self.m,
         )
+
         k3 = np.divide(
             self._SpringForces(
                 p0 + 0.5 * h * v0 + (h**2) / 8 * k2,
@@ -255,6 +257,7 @@ class Solver:
             ),
             self.m,
         )
+
         k4 = np.divide(
             self._SpringForces(
                 p0 + h * v0 + (h**2) / 2 * k3, v0 + h * k3, self.timesteps[i] + h, i

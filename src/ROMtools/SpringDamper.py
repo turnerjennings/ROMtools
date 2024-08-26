@@ -346,6 +346,8 @@ class LinearSpringDamper(SpringDamper):
             forces[3 * self.child + 1] = (F_toty) * (1 - self.constraint[1])
             forces[3 * self.child + 2] = (t_totc) * (1 - self.constraint[2])
 
+        #print(f"forces: {forces}")
+        #time.sleep(0.1)
         return forces
 
 
