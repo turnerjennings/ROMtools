@@ -75,7 +75,7 @@ class SpringDamper:
         self.ly0 = abs(y0p - y0c)
 
         self.l0 = np.linalg.norm([self.lx0, self.ly0])
-        self.l0t = t0p - t0c
+        self.lt0 = t0p - t0c
 
         # force tracking
         self.forcehist=[]
@@ -188,9 +188,8 @@ class LinearSpringDamper(SpringDamper):
         parent_pos: Tuple[float] = (0, 0),
         child_pos: Tuple[float] = (0, 0),
         dof_constraint: Tuple[bool] = (False, False, False),
-        track_force: bool = False,
         type: Literal["Linear", "Tensile", "Compressive", "Tabular"] = "Linear",
-        curve: np.ndarray = None,
+        curve: Optional[np.ndarray] = None,
         mu:Tuple[float] = (0.0,0.0)
     ) -> None:
 
@@ -199,12 +198,15 @@ class LinearSpringDamper(SpringDamper):
         )
         self.type = type
         self.mu = mu
+
+        #WIP contact definitions
         if self.mu[0] > 0 or self.mu[1] > 0:
             self.contact = True
         else:
             self.contact = False
 
         self.t_offset = 0
+
 
         if self.type == "Tabular":
             if curve is not None:
@@ -356,27 +358,12 @@ class RotationalSpringDamper(SpringDamper):
         p: float = 0,
         parent: Optional[RigidBody] = None,
         child: Optional[RigidBody] = None,
-        parent_pos: Tuple[float] = (0, 0),
-        child_pos: Tuple[float] = (0, 0),
         dof_constraint: Tuple[bool] = (False, False, False),
-        track_force: bool = False,
-        type: Literal["Linear", "Linked"] = "Linear",
-        link: Optional[LinearSpringDamper] = None,
-        linkcoef: Tuple[float] = (1, 1),
     ) -> None:
         super().__init__(
-            k, c, p, parent, child, parent_pos, child_pos, dof_constraint
+            k, c, p, parent, child, (0.0,0.0), (0.0,0.0), dof_constraint
         )
 
-        self.type = type
-        if self.type == "Linked":
-            if link is not None:
-                self.link = link
-                self.linkingcoef = linkcoef
-            else:
-                raise ValueError(
-                    "Linked linear spring must be specified for Linked type"
-                )
 
     def calculate_force(self, p: np.ndarray, v: np.ndarray) -> np.ndarray:
         forces = np.zeros(p.shape)
@@ -402,26 +389,9 @@ class RotationalSpringDamper(SpringDamper):
 
         # print(f"parent_t={parent_t}, child_t = {child_t}")
 
-        if self.type == "Linear":
-            T_k = self.k * (parent_t - child_t + self.p - self.l0t)
-            T_c = self.c * (parent_dt - child_dt)
 
-        elif self.type == "Linked":
-            linspringforce = self.link.calculate_force(p, v)
-            forcemag = np.linalg.norm(
-                [linspringforce[3 * self.parent], linspringforce[3 * self.parent + 1]]
-            )
-
-            T_k = (
-                forcemag
-                * self.linkingcoef[0]
-                * (parent_t - child_t + self.p - self.l0t)
-            )
-            T_c = forcemag * self.linkingcoef[1] * (parent_dt - child_dt)
-            print(
-                f"{forcemag:>10.4f},{forcemag*self.linkingcoef[0]:>10.4f}, {T_k:>10.4f}, {parent_t:>10.4f}"
-            )
-            time.sleep(0.1)
+        T_k = self.k * (parent_t - child_t + self.p - self.lt0)
+        T_c = self.c * (parent_dt - child_dt)
 
         T_tot = T_k + T_c
 

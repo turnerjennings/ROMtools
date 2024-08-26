@@ -2,7 +2,7 @@ import numpy as np
 from .RigidBody import *
 from .SpringDamper import *
 from .Configuration import *
-from .Force import Force
+from .Force import *
 from time import time
 import warnings
 from typing import List
@@ -15,7 +15,7 @@ class Solver:
         bodies: List[RigidBody],
         springs: List[SpringDamper],
         config: RunConfiguration,
-        forces: List[Force] = None,
+        bcs: List[Force,Displacement] = None,
     ) -> None:
         """Class to manage the solution process and store the subsequent output data
 
@@ -35,7 +35,7 @@ class Solver:
         self.springs = springs
         self.n_springs = len(springs)
 
-        self.forces = forces
+        self.bcs = bcs
 
         self.solver = config.solver_type
         mass_temp = []
@@ -209,14 +209,22 @@ class Solver:
 
         return forces_out
 
+    
+    
     def _BodyForces(self, i: int):
         forces_out = np.zeros((self.n_bodies * 3))
 
-        if self.forces is not None:
-            for f in self.forces:
-                forces_out[f.dof] = forces_out[f.dof] + f.ft[i]
+        if self.bcs is not None:
+            for f in self.bcs:
+                if type(f) == Force:
+                    forces_out[f.dof] = forces_out[f.dof] + f.ft[i]
 
         return forces_out
+    
+
+    #WIP prescribe displacement using penalty method.
+    def _PrescribedDisp(self, i: int):
+        pass
 
     def _RK4(self, i: int):
         h = self.dt

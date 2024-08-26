@@ -1,6 +1,10 @@
 site_name: ROMtools
 theme:
   name: material
+  palette:
+    primary: teal
+    accent: deep purple
+
   features:
     - navigation.instant
     - navigation.tabs
@@ -11,6 +15,18 @@ nav:
   - Overview: index.md
   - Rigid Bodies: RigidBody.md
   - Springs and Dampers: SpringDamper.md
-  - External Forces: Forces.md
+  - Boundary Conditions: Forces.md
   - Solver: Solver.md
   - Animation: Animation.md
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css

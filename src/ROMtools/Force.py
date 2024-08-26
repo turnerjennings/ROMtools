@@ -3,7 +3,7 @@ from typing import Literal, Callable, List, Union
 from .Configuration import RunConfiguration
 
 
-class Force:
+class BoundaryCondition:
 
     def __init__(
         self,
@@ -27,6 +27,20 @@ class Force:
         self.dof = 3 * self.bodies + dof
         self.t = np.linspace(0, config.termination_time, config.n_timesteps)
 
+
+
+
+class Force(BoundaryCondition):
+    
+    def __init__(self,
+                 config: RunConfiguration, 
+                 f: Union[float, np.ndarray, Callable[[np.ndarray], np.ndarray]], 
+                 body: Union[List[int], int], 
+                 dof: Literal[0, 1, 2], 
+                 *args, 
+                 **kwargs) -> None:
+        super().__init__(config, f, body, dof, *args, **kwargs)
+
         if type(f) == np.ndarray:
             if f.shape[0] < self.t.shape[0]:
                 pad = self.t.shape[0] - f.shape[0]
@@ -39,3 +53,28 @@ class Force:
             self.ft = f * np.ones(self.t.shape)
         else:
             self.ft = f(self.t, *args, **kwargs)
+
+
+class Displacement(BoundaryCondition):
+    
+    def __init__(self,
+                 config: RunConfiguration, 
+                 f: Union[float, np.ndarray, Callable[[np.ndarray], np.ndarray]], 
+                 body: Union[List[int], int], 
+                 dof: Literal[0, 1, 2], 
+                 *args, 
+                 **kwargs) -> None:
+        super().__init__(config, f, body, dof, *args, **kwargs)
+
+        if type(f) == np.ndarray:
+            if f.shape[0] < self.t.shape[0]:
+                pad = self.t.shape[0] - f.shape[0]
+                self.dt = np.pad(f, (0, pad), mode="constant", constant_values=0.0)
+            elif f.shape[0] > self.t.shape[0]:
+                self.dt = f[: self.t.shape[0]]
+            else:
+                self.dt = f
+        elif type(f) == float:
+            self.dt = f * np.ones(self.t.shape)
+        else:
+            self.dt = f(self.t, *args, **kwargs)

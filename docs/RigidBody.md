@@ -1,8 +1,12 @@
 # Rigid Bodies
 
+
 A class to define rigid objects of interest to perform rigid body dynamics simulation on.  All calculations are performed treating the x-, y-, and theta- movement of the center of mass as the degrees of freedom for the body.
 
+---
+
 ## Attributes
+
 
 | Attribute | Type | Description|
 |---------|-------------|-------------|
@@ -19,7 +23,9 @@ A class to define rigid objects of interest to perform rigid body dynamics simul
 | v0 | tuple[float, float, float] | Initial velocity of the rigid body |
 | a0 | tuple[float, float, float] | Initial acceleration of the rigid body |
 
-## subclasses
+---
+
+## Subclasses
 
 All subclasses share the same methods detailed below, but configure a pre-specified rigid body for simplicity.  Selection of pre-specified rigid body geometry affects moment of inertia calculation and animation rendering:
 
@@ -27,7 +33,7 @@ All subclasses share the same methods detailed below, but configure a pre-specif
 - Semicircle
 - Circle
 
-
+---
 
 ## Methods
 
