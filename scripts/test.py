@@ -9,7 +9,7 @@ sys.path.append(src_path)
 
 from ROMtools import *
 
-body1=Ellipsoid(0, 1,a = 2, b = 1.5, cm=(0.0,1.0, 0.0),name="mass")
+body1=Disc(cm,)
 body1.initial_conditions(p=(0.0,0.1,0.0))
 
 springstiffness = np.array([[0,0],[0.05,100],[0.1,10]])
@@ -48,7 +48,7 @@ config_CD.update_from_dict({
 
 solver_RK = Solver([body1], [spring1], config=config)
 solver_RK.Solve()
-
+Solver()
 
 anim = Animator(solver_RK)
 anim.animate()

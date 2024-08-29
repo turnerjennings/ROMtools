@@ -4,9 +4,9 @@ Rigid Body Dynamics tools for 2-D reduced order modelling of structural dynamics
 
 ## Installation
 
-Package is not available on pip pending full testing.  Repository can be downloaded and installed locally:
+The package can be downloaded and installed using pip:
 
-    py -m pip install .
+    py -m pip install ROMtools
 
 
 ## Project Overview

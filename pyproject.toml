@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ROMtools"
+authors = [{name = "Turner Jennings", email = "turner.jennings@outlook.com"}]
+description = "Rigid body dynamics tools for reduced order modeling of deformable systems"
+readme = "README.md"
+license = {file = "LICENSE"}
+version = "0.2.5"
+
+keywords = ["rigid-body-dynamics","reduced-order-modeling"]
+
+classifiers=[
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering"
+]
+
+requires-python = ">=3.8.1"
+dependencies = [
+    "numpy",
+    "matplotlib"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest"
+]
+
+
+[project.urls]
+Repository = "https://github.com/turnerjennings/ROMtools.git"
+Documentation = "https://turnerjennings.github.io/ROMtools/"
+Issues = "https://turnerjennings.github.io/ROMtools/issues"
