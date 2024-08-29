@@ -13,8 +13,10 @@ The attributes below are universal to all springtypes.
 | c | float | Linear damping constant |
 | p | float | initial spring compression |
 | constraint | tuple [bool, bool, bool] | ($x$, $y$, $\theta$) spring/damper constraints, if True then spring/damper does not act along the specified axis |
-| parent | int | Body 1 connected to spring/damper.  Relative angles and positions measured relative to this body |
-| child | int | Body 2 connected to spring/damper |
+| parent | int | ID of body 1 connected to spring/damper.  Relative angles and positions measured relative to this body |
+| parent_r | double | Radius of parent body |
+| child | int | ID of body 2 connected to spring/damper |
+| child_r | radius of child body |
 | xp, yp | float | Coordinates of parent body connection relative to parent body center of mass.  If parent body is None, then absolute coordinates of connection to rigid boundary |
 | xc, yc | float | Coordinates of child body connection relative to child body center of mass.  If child body is None, then absolute coordinates of connection to rigid boundary |
 | l0x, l0y, l0t | float | initial length (or angle) between the parent and child body.  Spring displacements are measured relative to this property. |

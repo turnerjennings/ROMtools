@@ -22,19 +22,23 @@ class SpringDamper:
     ) -> None:
         if parent is not None:
             self.parent = parent.ID
+            self.parent_r = parent.R
             self.xp = parent_pos[0]
             self.yp = parent_pos[1]
         else:
             self.parent = -1
+            self.parent_r = 0.0
             self.xp = parent_pos[0]
             self.yp = parent_pos[1]
 
         if child is not None:
             self.child = child.ID
+            self.child_r = child.R
             self.xc = child_pos[0]
             self.yc = child_pos[1]
         else:
             self.child = -1
+            self.child_r = 0.0
             self.xc = child_pos[0]
             self.yc = child_pos[1]
 
@@ -264,8 +268,11 @@ class LinearSpringDamper(SpringDamper):
         T_pk = armpx * F_ky - armpy * F_kx
         T_ck = armcx * F_ky - armcy * F_kx
 
-        T_link = 0.0
-        T_vel = 0.0
+        T_link_p = 0.0
+        T_link_c = 0.0
+
+        T_vel_p = 0.0
+        T_vel_c = 0.0
         
         #calculate linked torque
         if self.mu[0] > 0.0 or self.mu[1] > 0.0:
@@ -284,14 +291,18 @@ class LinearSpringDamper(SpringDamper):
                 theta_child = 0.0
                 omega_child = 0.0
 
-            T_link = self.mu[0]*force_mag*(theta_parent-theta_child + self.t_offset)
+            T_link_p = self.mu[0]*self.parent_r*force_mag*(theta_parent-theta_child + self.t_offset)
+            T_link_c = self.mu[0]*self.child_r*force_mag*(theta_parent-theta_child + self.t_offset)
 
             if self.type == "Compressive" and stretch < 0.0:
-                T_vel = self.mu[1]*force_mag*(omega_parent-omega_child)
+                T_vel_p = self.mu[1]*self.parent_r*force_mag*(omega_parent-omega_child)
+                T_vel_c = self.mu[1]*self.child_r*force_mag*(omega_parent-omega_child)
             elif self.type == "Tensile" and stretch > 0.0:
-                T_vel = self.mu[1]*force_mag*(omega_parent-omega_child)
+                T_vel_p = self.mu[1]*self.parent_r*force_mag*(omega_parent-omega_child)
+                T_vel_c = self.mu[1]*self.child_r*force_mag*(omega_parent-omega_child)
             elif self.type == "Linear" or self.type == "Tabular":
-                T_vel = self.mu[1]*force_mag*(omega_parent-omega_child)
+                T_vel_p = self.mu[1]*self.parent_r*force_mag*(omega_parent-omega_child)
+                T_vel_c = self.mu[1]*self.child_r*force_mag*(omega_parent-omega_child)
             #print(f"T_link = {T_link}, delta theta = {theta_parent - theta_child}")
             #time.sleep(0.1)
         
@@ -331,8 +342,8 @@ class LinearSpringDamper(SpringDamper):
         # calculate force balance and update force array
         F_totx = F_kx + F_cx
         F_toty = F_ky + F_cy
-        T_totp = - T_pk - T_pC + T_link + T_vel
-        t_totc = T_ck + T_cC - T_link - T_vel
+        T_totp = - T_pk - T_pC + T_link_p + T_vel_p
+        t_totc = T_ck + T_cC - T_link_c - T_vel_c
 
         if self.parent >= 0:
 
