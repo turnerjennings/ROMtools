@@ -16,6 +16,7 @@ class Solver:
         springs: List[SpringDamper],
         config: RunConfiguration,
         bcs: List[Union[Force,Displacement]] = None,
+        verbose: bool = True
     ) -> None:
         """Class to manage the solution process and store the subsequent output data
 
@@ -25,7 +26,7 @@ class Solver:
             config (RunConfiguration): RunConfiguration object which dictates run settings
             forces (List[Force], optional): List of external forces to include in the analysis. Defaults to None.
         """
-
+        self.verbose = verbose
         self.solved = False
         self.config = config
 
@@ -77,7 +78,9 @@ class Solver:
     def Solve(self):
         """Generate a solution for the given inputs, does not return a value but populates the solver position, velocity, acceleration, and force arrays"""
         fail = -1
-        print("Solving model...")
+
+        if self.verbose == True:
+            print("Solving model...")
         start_time = time()
         for i in range(self.n_timesteps - 1):
 
@@ -114,12 +117,14 @@ class Solver:
 
         self._SaveData()
         end_time = time()
-        if fail > 0:
+        if fail > 0 and self.verbose == True:
             print(
                 f"Solution failed on timestep {i}, time elapsed: {end_time - start_time:.3f}"
             )
-        else:
+        elif self.verbose == True:
             print(f"Solution complete, time elapsed: {end_time - start_time:.3f}")
+            self.solved = True
+        else:
             self.solved = True
 
 
