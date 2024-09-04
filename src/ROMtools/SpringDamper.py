@@ -1,7 +1,6 @@
 import numpy as np
 from math import cos, sin
 
-from ROMtools.RigidBody import RigidBody
 from .RigidBody import *
 import time
 from typing import Tuple, Optional, Literal

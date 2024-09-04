@@ -28,6 +28,7 @@ class RigidBody:
             I (Optional[float], optional): Optional moment of inertia, I=m*R**2 otherwise. Defaults to None.
             dof_constraint (Tuple[bool,bool,bool], optional): Optional constraint of motion along certain degrees of freedom. Defaults to (False, False, False).
         """
+        v=_RigidBodyValidator(ID,m,R,name,cm,I,dof_constraint)
 
         self.ID = ID
         self.name = name
@@ -190,3 +191,53 @@ class Ellipsoid(RigidBody):
             ax.plot(head_points_x, head_points_y, color=color)
 
         ax.plot(angle_line_x, angle_line_y, color="black", alpha=0.5)
+
+
+class _RigidBodyValidator:
+    
+    def __init__(        
+        self,
+        ID: int,
+        m: float,
+        R: float,
+        name: str = "",
+        cm: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+        I: Optional[float] = None,
+        dof_constraint: Tuple[bool, bool, bool] = (False, False, False),
+        ):
+        
+        #check ID
+        if type(ID) != int:
+            raise TypeError("RigidBody 'ID' must be an integer")
+        elif ID < 0:
+            raise ValueError("RigidBody 'ID' must be non-negative")
+        
+        #check mass
+        if type(m) != int and type(m) != float:
+            raise TypeError("RigidBody 'm' must be a float")
+        elif m < 0:
+            raise ValueError("RigidBody mass 'm' must be non-negative")
+        
+        #check radius
+        if type(R) != int and type(R) != float:
+            raise TypeError("RigidBody 'R' must be a float")
+        elif R < 0:
+            raise ValueError("RigidBody radius 'R' must be non-negative")
+        
+        #check inertia
+        if I is not None and type(I) != int and type(I) != float:
+            raise TypeError("RigidBody 'I' must be a float")
+        elif I is not None and I < 0:
+            raise ValueError("RigidBody inertia 'I' must be non-negative")
+        
+        #check center mass
+        if type(cm) != tuple:
+            raise TypeError("RigidBody 'cm' must be tuple")
+        elif len(cm) != 3:
+            raise ValueError("RigidBody 'cm' must be a tuple of length 3")
+        
+        #check dof constraint
+        if type(dof_constraint) != tuple:
+            raise TypeError("RigidBody 'dof_constraint' must be tuple")
+        elif len(dof_constraint) != 3:
+            raise ValueError("RigidBody 'dof_constraint' must be a tuple of length 3")

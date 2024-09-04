@@ -5,3 +5,4 @@ build
 dist
 ROMtools.egg-info
 romrev2
+.vscode
