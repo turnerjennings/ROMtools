@@ -41,6 +41,7 @@ class Solver:
         springs: List[SpringDamper],
         config: RunConfiguration,
         bcs: List[Union[Force,Displacement]] = None,
+        verbose: bool = False,
     ) -> None:
 
 
@@ -68,6 +69,7 @@ sol = Solver([disc1],[spring],run_config)
 | springs | List [SpringDamper] | Spring/dampers to include in the analysis |
 | config | RunConfiguration | Run settings for analysis |
 | bcs | List [Force, Displacement] (optional) | External forces or prescribed motions for the analysis |
+| verbose | bool | Specify whether to print solution steps and timing to the command window |
 
 __Returns__
 

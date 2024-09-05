@@ -128,7 +128,9 @@ class Animator:
         with writer.saving(fig, self.path + "_anim.gif", 100):
             for idx, i in enumerate(frames):
                 ax.cla()
-                print(f"Rendering frame {idx}...")
+
+                if idx % 5 == 0:
+                    print(f"Rendering frame {idx}...")
 
                 for j, body in enumerate(self.bodies):
                     # print(f"j={j}, body = {body}, body ID = {body.ID}")
