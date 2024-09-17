@@ -1,5 +1,7 @@
 import os
 import sys
+import numpy as np
+from math import cos, sin, pi
 
 from ROMtools import *
 
