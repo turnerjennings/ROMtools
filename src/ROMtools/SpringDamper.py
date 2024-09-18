@@ -290,18 +290,27 @@ class LinearSpringDamper(SpringDamper):
                 theta_child = 0.0
                 omega_child = 0.0
 
-            T_link_p = self.mu[0]*self.parent_r*force_mag*(theta_parent-theta_child + self.t_offset)
-            T_link_c = self.mu[0]*self.child_r*force_mag*(theta_parent-theta_child + self.t_offset)
+            #calculate magnitude and vector of 
+            F_link = force_mag*(theta_parent-theta_child + self.t_offset)
+            F_vel = force_mag *(omega_parent-omega_child)
 
+            #parent=ccw, child=cw
+            F_link_p = F_link*np.array([r_rely,-r_relx])
+            F_vel_c = F_vel*np.array([-r_rely,r_relx])
+
+            T_link_p = self.mu[0]*self.parent_r*F_link
+            T_link_c = self.mu[0]*self.child_r*F_link
+
+            #calculate damping component
             if self.type == "Compressive" and stretch < 0.0:
-                T_vel_p = self.mu[1]*self.parent_r*force_mag*(omega_parent-omega_child)
-                T_vel_c = self.mu[1]*self.child_r*force_mag*(omega_parent-omega_child)
+                T_vel_p = self.mu[1]*self.parent_r*F_vel
+                T_vel_c = self.mu[1]*self.child_r*F_vel
             elif self.type == "Tensile" and stretch > 0.0:
-                T_vel_p = self.mu[1]*self.parent_r*force_mag*(omega_parent-omega_child)
-                T_vel_c = self.mu[1]*self.child_r*force_mag*(omega_parent-omega_child)
+                T_vel_p = self.mu[1]*self.parent_r*F_vel
+                T_vel_c = self.mu[1]*self.child_r*F_vel
             elif self.type == "Linear" or self.type == "Tabular":
-                T_vel_p = self.mu[1]*self.parent_r*force_mag*(omega_parent-omega_child)
-                T_vel_c = self.mu[1]*self.child_r*force_mag*(omega_parent-omega_child)
+                T_vel_p = self.mu[1]*self.parent_r*F_vel
+                T_vel_c = self.mu[1]*self.child_r*F_vel
             #print(f"T_link = {T_link}, delta theta = {theta_parent - theta_child}")
             #time.sleep(0.1)
         
@@ -339,8 +348,12 @@ class LinearSpringDamper(SpringDamper):
         T_cC = armcx * F_cy - armcy * F_cx
 
         # calculate force balance and update force array
-        F_totx = F_kx + F_cx
-        F_toty = F_ky + F_cy
+        F_totx = F_kx + F_cx + F_link_p[0] + F_vel_c[0]
+        F_toty = F_ky + F_cy + F_link_p[1] + F_vel_c[1]
+        #print(f"F link y-dir child: {F_link_p[1]}, F vel y-dir child: {F_vel_c[1]}")
+        #time.sleep(0.1)
+
+
         T_totp = - T_pk - T_pC + T_link_p + T_vel_p
         t_totc = T_ck + T_cC - T_link_c - T_vel_c
 

@@ -8,7 +8,7 @@ authors = [{name = "Turner Jennings", email = "turner.jennings@outlook.com"}]
 description = "Rigid body dynamics tools for reduced order modeling of deformable systems"
 readme = "README.md"
 license = {file = "LICENSE"}
-version = "0.2.5"
+version = "0.2.6"
 
 keywords = ["rigid-body-dynamics","reduced-order-modeling"]
 

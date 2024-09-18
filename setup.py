@@ -3,7 +3,7 @@ from setuptools import setup,find_packages
 
 setup(
     name='ROMtools',
-    version='0.2.5',
+    version='0.2.6',
     description='Tools for reduced order modelling of dynamical systems',
     author='Turner Jennings',
     author_email='turner.jennings@outlook.com',
