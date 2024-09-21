@@ -1,4 +1,4 @@
-from src.ROMtools.RigidBody import *
+from ROMtools.RigidBody import RigidBody
 
 
 class TestRigidBody:
