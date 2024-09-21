@@ -1,6 +1,5 @@
 import numpy as np
 from math import pi, cos, sin
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from typing import Tuple, Optional
 

@@ -3,7 +3,7 @@ from .RigidBody import *
 from .SpringDamper import *
 from .Configuration import *
 from .Force import *
-from time import time, sleep
+from time import time
 import warnings
 from typing import List
 
