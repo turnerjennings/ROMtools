@@ -36,3 +36,7 @@ dev = [
 Repository = "https://github.com/turnerjennings/ROMtools.git"
 Documentation = "https://turnerjennings.github.io/ROMtools/"
 Issues = "https://turnerjennings.github.io/ROMtools/issues"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+
