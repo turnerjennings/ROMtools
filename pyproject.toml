@@ -27,9 +27,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest"
-]
+dev = ["pytest", "ruff"]
 
 
 [project.urls]
@@ -40,3 +38,22 @@ Issues = "https://turnerjennings.github.io/ROMtools/issues"
 [tool.pytest.ini_options]
 testpaths = "tests"
 
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py312"
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Use double quotes for strings.
+quote-style = "double"
+
+# Indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Automatically detect the appropriate line ending.
+line-ending = "auto"
