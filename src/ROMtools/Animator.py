@@ -8,7 +8,6 @@ from typing import Tuple, Optional
 
 
 class Animator:
-
     def __init__(
         self,
         sol: Solver,

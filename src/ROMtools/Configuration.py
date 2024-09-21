@@ -19,7 +19,7 @@ class RunConfiguration:
     output_force: bool = True
 
     # general settings
-    solver_type: Literal["RK4","FwdEuler","CentralDifference"] = "RK4"
+    solver_type: Literal["RK4", "FwdEuler", "CentralDifference"] = "RK4"
 
     # timing information
     termination_time: float = 1.0

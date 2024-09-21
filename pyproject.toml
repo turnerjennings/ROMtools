@@ -4,27 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ROMtools"
-authors = [{name = "Turner Jennings", email = "turner.jennings@outlook.com"}]
+authors = [{ name = "Turner Jennings", email = "turner.jennings@outlook.com" }]
 description = "Rigid body dynamics tools for reduced order modeling of deformable systems"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 version = "0.2.6"
 
-keywords = ["rigid-body-dynamics","reduced-order-modeling"]
+keywords = ["rigid-body-dynamics", "reduced-order-modeling"]
 
-classifiers=[
+classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
-    "Topic :: Scientific/Engineering"
+    "Topic :: Scientific/Engineering",
 ]
 
 requires-python = ">=3.8.1"
-dependencies = [
-    "numpy",
-    "matplotlib"
-]
+dependencies = ["numpy", "matplotlib"]
 
 [project.optional-dependencies]
 dev = ["pytest", "ruff"]

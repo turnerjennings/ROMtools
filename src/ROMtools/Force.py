@@ -4,7 +4,6 @@ from .Configuration import RunConfiguration
 
 
 class BoundaryCondition:
-
     def __init__(
         self,
         config: RunConfiguration,
@@ -12,7 +11,7 @@ class BoundaryCondition:
         body: Union[List[int], int],
         dof: Literal[0, 1, 2],
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         """Class to store a external force to be applied to a solver system.  Force can be provided as a function, numpy array, or scalar value.
 
@@ -28,17 +27,16 @@ class BoundaryCondition:
         self.t = np.linspace(0, config.termination_time, config.n_timesteps)
 
 
-
-
 class Force(BoundaryCondition):
-    
-    def __init__(self,
-                 config: RunConfiguration, 
-                 f: Union[float, np.ndarray, Callable[[np.ndarray], np.ndarray]], 
-                 body: Union[List[int], int], 
-                 dof: Literal[0, 1, 2], 
-                 *args, 
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        config: RunConfiguration,
+        f: Union[float, np.ndarray, Callable[[np.ndarray], np.ndarray]],
+        body: Union[List[int], int],
+        dof: Literal[0, 1, 2],
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(config, f, body, dof, *args, **kwargs)
 
         if type(f) == np.ndarray:
@@ -56,14 +54,15 @@ class Force(BoundaryCondition):
 
 
 class Displacement(BoundaryCondition):
-    
-    def __init__(self,
-                 config: RunConfiguration, 
-                 f: Union[float, np.ndarray, Callable[[np.ndarray], np.ndarray]], 
-                 body: Union[List[int], int], 
-                 dof: Literal[0, 1, 2], 
-                 *args, 
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        config: RunConfiguration,
+        f: Union[float, np.ndarray, Callable[[np.ndarray], np.ndarray]],
+        body: Union[List[int], int],
+        dof: Literal[0, 1, 2],
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(config, f, body, dof, *args, **kwargs)
 
         if type(f) == np.ndarray:
