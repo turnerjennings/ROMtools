@@ -3,20 +3,19 @@ from .RigidBody import *
 from .SpringDamper import *
 from .Configuration import *
 from .Force import *
-from time import time,sleep
+from time import time
 import warnings
 from typing import List
 
 
 class Solver:
-
     def __init__(
         self,
         bodies: List[RigidBody],
         springs: List[SpringDamper],
         config: RunConfiguration,
-        bcs: List[Union[Force,Displacement]] = None,
-        verbose: bool = True
+        bcs: List[Union[Force, Displacement]] = None,
+        verbose: bool = True,
     ) -> None:
         """Class to manage the solution process and store the subsequent output data
 
@@ -42,18 +41,18 @@ class Solver:
         mass_temp = []
         self.constraint = []
 
-        #check for contact
-        self.contact=False
+        # check for contact
+        self.contact = False
         for spring in springs:
             if spring.contact == True:
-                self.contact=True
+                self.contact = True
 
         for body in bodies:
-            #generate mass vector for body
+            # generate mass vector for body
             mass_temp.append(body.m)
             mass_temp.append(body.m)
             mass_temp.append(body.I)
-            self.constraint += list(body.constraint)           
+            self.constraint += list(body.constraint)
 
         self.m = np.array(mass_temp)
 
@@ -83,7 +82,6 @@ class Solver:
             print("Solving model...")
         start_time = time()
         for i in range(self.n_timesteps - 1):
-
             if self.config.solver_type == "RK4":
                 self._RK4(i)
             elif self.config.solver_type == "FwdEuler":
@@ -110,7 +108,7 @@ class Solver:
 
                 break
 
-        #update spring force history
+        # update spring force history
         for s in self.springs:
             if s.forcehist is not None:
                 s.forcehist = np.array(s.forcehist)
@@ -126,8 +124,6 @@ class Solver:
             self.solved = True
         else:
             self.solved = True
-
-
 
     def _SaveData(self):
         output_path = self.config.output_path + self.config.output_name
@@ -191,16 +187,20 @@ class Solver:
         forces_out = np.zeros(p.shape)
 
         for spring in self.springs:
-            #update contact point
+            # update contact point
             if t_idx >= 1:
-                if spring.contact == True and spring.forcehist[t_idx-1:0]+spring.forcehist[t_idx-1:1] == 0:
+                if (
+                    spring.contact == True
+                    and spring.forcehist[t_idx - 1 : 0]
+                    + spring.forcehist[t_idx - 1 : 1]
+                    == 0
+                ):
                     print("changing spring theta offset")
-                    spring.t_offset = p[spring.parent+2]
+                    spring.t_offset = p[spring.parent + 2]
 
             spring_force = spring.calculate_force(p, v)
 
             forces_out += spring_force
-
 
             # update spring force history if requested
             if save_hist == True:
@@ -214,8 +214,6 @@ class Solver:
                 )
         return forces_out
 
-    
-    
     def _BodyForces(self, i: int):
         forces_out = np.zeros((self.n_bodies * 3))
 
@@ -225,9 +223,8 @@ class Solver:
                     forces_out[f.dof] = forces_out[f.dof] + f.ft[i]
 
         return forces_out
-    
 
-    #WIP prescribe displacement using penalty method.
+    # WIP prescribe displacement using penalty method.
     def _PrescribedDisp(self, i: int):
         pass
 

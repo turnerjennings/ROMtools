@@ -3,12 +3,10 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import PillowWriter
 from .Solver import *
 from matplotlib.gridspec import GridSpec
-from matplotlib.axes import Axes
 from typing import Tuple, Optional
 
 
 class Animator:
-
     def __init__(
         self,
         sol: Solver,

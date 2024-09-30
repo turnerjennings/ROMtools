@@ -1,12 +1,10 @@
 import numpy as np
 from math import pi, cos, sin
-import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from typing import Tuple, Optional
 
 
 class RigidBody:
-
     def __init__(
         self,
         ID: int,
@@ -28,7 +26,7 @@ class RigidBody:
             I (Optional[float], optional): Optional moment of inertia, I=m*R**2 otherwise. Defaults to None.
             dof_constraint (Tuple[bool,bool,bool], optional): Optional constraint of motion along certain degrees of freedom. Defaults to (False, False, False).
         """
-        v=_RigidBodyValidator(ID,m,R,name,cm,I,dof_constraint)
+        v = _RigidBodyValidator(ID, m, R, name, cm, I, dof_constraint)
 
         self.ID = ID
         self.name = name
@@ -74,7 +72,6 @@ class RigidBody:
 
 
 class Disc(RigidBody):
-
     def _inertia(self):
         return 0.5 * self.m * self.R**2
 
@@ -98,7 +95,6 @@ class Disc(RigidBody):
 
 
 class Semicircle(RigidBody):
-
     def _inertia(self):
         return 0.5 * self.m * self.R**2
 
@@ -129,7 +125,6 @@ class Semicircle(RigidBody):
 
 
 class circle(RigidBody):
-
     def _inertia(self):
         return self.m * self.R**2
 
@@ -153,7 +148,6 @@ class circle(RigidBody):
 
 
 class Ellipsoid(RigidBody):
-
     def __init__(
         self,
         ID: int,
@@ -165,14 +159,13 @@ class Ellipsoid(RigidBody):
         I: Optional[float] = None,
         dof_constraint: Tuple[bool, bool, bool] = (False, False, False),
     ) -> None:
-        R= 0.5*(a+b)
+        R = 0.5 * (a + b)
         self.a = a
         self.b = b
         super().__init__(ID, m, R, name, cm, I, dof_constraint)
 
-
     def _inertia(self):
-        return 0.2*self.m*(self.a**2 + self.b**2)
+        return 0.2 * self.m * (self.a**2 + self.b**2)
 
     def render_body(self, ax: Axes, p: np.ndarray, color: str = "green"):
         xcen = p[0]
@@ -180,7 +173,7 @@ class Ellipsoid(RigidBody):
         theta = p[2]
 
         theta_array = np.linspace(0, 2 * pi, 51)
-        head_points_x = xcen + self.a* np.cos(theta + theta_array)
+        head_points_x = xcen + self.a * np.cos(theta + theta_array)
         head_points_y = ycen + self.b * np.sin(theta + theta_array)
 
         angle_line_x = np.array([head_points_x[0], head_points_x[25]])
@@ -194,8 +187,7 @@ class Ellipsoid(RigidBody):
 
 
 class _RigidBodyValidator:
-    
-    def __init__(        
+    def __init__(
         self,
         ID: int,
         m: float,
@@ -204,39 +196,38 @@ class _RigidBodyValidator:
         cm: Tuple[float, float, float] = (0.0, 0.0, 0.0),
         I: Optional[float] = None,
         dof_constraint: Tuple[bool, bool, bool] = (False, False, False),
-        ):
-        
-        #check ID
+    ):
+        # check ID
         if type(ID) != int:
             raise TypeError("RigidBody 'ID' must be an integer")
         elif ID < 0:
             raise ValueError("RigidBody 'ID' must be non-negative")
-        
-        #check mass
+
+        # check mass
         if type(m) != int and type(m) != float:
             raise TypeError("RigidBody 'm' must be a float")
         elif m < 0:
             raise ValueError("RigidBody mass 'm' must be non-negative")
-        
-        #check radius
+
+        # check radius
         if type(R) != int and type(R) != float:
             raise TypeError("RigidBody 'R' must be a float")
         elif R < 0:
             raise ValueError("RigidBody radius 'R' must be non-negative")
-        
-        #check inertia
+
+        # check inertia
         if I is not None and type(I) != int and type(I) != float:
             raise TypeError("RigidBody 'I' must be a float")
         elif I is not None and I < 0:
             raise ValueError("RigidBody inertia 'I' must be non-negative")
-        
-        #check center mass
+
+        # check center mass
         if type(cm) != tuple:
             raise TypeError("RigidBody 'cm' must be tuple")
         elif len(cm) != 3:
             raise ValueError("RigidBody 'cm' must be a tuple of length 3")
-        
-        #check dof constraint
+
+        # check dof constraint
         if type(dof_constraint) != tuple:
             raise TypeError("RigidBody 'dof_constraint' must be tuple")
         elif len(dof_constraint) != 3:

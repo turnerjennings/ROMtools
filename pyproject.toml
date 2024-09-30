@@ -4,35 +4,53 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ROMtools"
-authors = [{name = "Turner Jennings", email = "turner.jennings@outlook.com"}]
+authors = [{ name = "Turner Jennings", email = "turner.jennings@outlook.com" }]
 description = "Rigid body dynamics tools for reduced order modeling of deformable systems"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 version = "0.2.6"
 
-keywords = ["rigid-body-dynamics","reduced-order-modeling"]
+keywords = ["rigid-body-dynamics", "reduced-order-modeling"]
 
-classifiers=[
+classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
-    "Topic :: Scientific/Engineering"
+    "Topic :: Scientific/Engineering",
 ]
 
 requires-python = ">=3.8.1"
-dependencies = [
-    "numpy",
-    "matplotlib"
-]
+dependencies = ["numpy", "matplotlib"]
 
 [project.optional-dependencies]
-dev = [
-    "pytest"
-]
+dev = ["pytest", "ruff"]
 
 
 [project.urls]
 Repository = "https://github.com/turnerjennings/ROMtools.git"
 Documentation = "https://turnerjennings.github.io/ROMtools/"
 Issues = "https://turnerjennings.github.io/ROMtools/issues"
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py312"
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Use double quotes for strings.
+quote-style = "double"
+
+# Indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Automatically detect the appropriate line ending.
+line-ending = "auto"
