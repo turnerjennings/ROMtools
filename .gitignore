@@ -6,3 +6,6 @@ dist
 ROMtools.egg-info
 romrev2
 .vscode
+venv/
+.pytest_cache/
+.ruff_cache/

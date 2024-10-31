@@ -76,11 +76,13 @@ class Solver:
 
     def Solve(self):
         """Generate a solution for the given inputs, does not return a value but populates the solver position, velocity, acceleration, and force arrays"""
+        #set a flag for run failure
         fail = -1
 
         if self.verbose == True:
             print("Solving model...")
         start_time = time()
+
         for i in range(self.n_timesteps - 1):
             if self.config.solver_type == "RK4":
                 self._RK4(i)
@@ -286,6 +288,7 @@ class Solver:
         F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
 
         self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
+        
         self.acceleration_array[i + 1, :] = np.divide(
             self._SpringForces(p0, v0, self.timesteps[i], i), self.m
         )

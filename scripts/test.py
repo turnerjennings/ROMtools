@@ -2,6 +2,10 @@ import numpy as np
 
 from ROMtools import *
 
+from time import time
+
+tstart = time()
+
 body1 = Disc(ID=0, m=1, R=1, cm=(0, 1, 0))
 body1.initial_conditions(p=(0.0, 0.1, 0.0))
 
@@ -17,10 +21,15 @@ config.update_from_dict(
         "output_name": "RK4",
         "n_timesteps": 250,
         "termination_time": 2,
+        "solver_type": "RK4"
     }
 )
 
+tend=time()
+
+print(f"initialization time: {tend-tstart:.20f} seconds")
 solver_RK = Solver(bodies=[body1], springs=[spring1], config=config)
+
 solver_RK.Solve()
 
 # anim = Animator(solver_RK)
@@ -29,9 +38,11 @@ solver_RK.Solve()
 
 import matplotlib.pyplot as plt
 
-validation = 0.1 * np.cos(np.sqrt(100 / 1) * solver_RK.timesteps) + 1
 
-color = (solver_RK.position_array[:, 1] - validation) ** 2
+validation = 0.1 * np.cos(np.sqrt(100 / 1) * solver_RK.timesteps) + 1
+color = (solver_RK.position_array[:, 1] - validation)
+
+print(np.sum(color)/np.sum(solver_RK.position_array[:, 1]))
 
 fig, ax = plt.subplots(1, 1)
 

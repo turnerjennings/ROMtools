@@ -267,6 +267,8 @@ class LinearSpringDamper(SpringDamper):
         T_vel_p = 0.0
         T_vel_c = 0.0
 
+        F_link = 0.0
+        F_vel = 0.0
         # calculate linked torque
         if self.mu[0] > 0.0 or self.mu[1] > 0.0:
             if self.parent >= 0:
@@ -287,10 +289,6 @@ class LinearSpringDamper(SpringDamper):
             F_link = force_mag * (theta_parent - theta_child + self.t_offset)
             F_vel = force_mag * (omega_parent - omega_child)
 
-            # parent=ccw, child=cw
-            F_link_p = F_link * np.array([r_rely, -r_relx])
-            F_vel_c = F_vel * np.array([-r_rely, r_relx])
-
             T_link_p = self.mu[0] * self.parent_r * F_link
             T_link_c = self.mu[0] * self.child_r * F_link
 
@@ -306,6 +304,8 @@ class LinearSpringDamper(SpringDamper):
                 T_vel_c = self.mu[1] * self.child_r * F_vel
             # print(f"T_link = {T_link}, delta theta = {theta_parent - theta_child}")
             # time.sleep(0.1)
+        F_link_p = F_link * np.array([r_rely, -r_relx])
+        F_vel_c = F_vel * np.array([-r_rely, r_relx])
 
         # calculate parent and child relative velocities
 
