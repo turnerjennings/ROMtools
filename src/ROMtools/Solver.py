@@ -223,6 +223,7 @@ class Solver:
             for f in self.bcs:
                 if type(f) == Force:
                     forces_out[f.dof] = forces_out[f.dof] + f.ft[i]
+                    print(forces_out)
 
         return forces_out
 
@@ -238,7 +239,9 @@ class Solver:
 
         F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
 
-        self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
+        F_next = F_next + self._BodyForces(i)
+
+        self.global_force_array[i + 1, :] = F_next 
 
         k1 = np.divide(F_next, self.m)
 
@@ -287,7 +290,9 @@ class Solver:
 
         F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
 
-        self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
+        F_next = F_next + self._BodyForces(i)
+
+        self.global_force_array[i + 1, :] = F_next
         
         self.acceleration_array[i + 1, :] = np.divide(
             self._SpringForces(p0, v0, self.timesteps[i], i), self.m
@@ -310,7 +315,9 @@ class Solver:
 
         F_next = self._SpringForces(p0, v0, self.timesteps[i], i, save_hist=True)
 
-        self.global_force_array[i + 1, :] = F_next + self._BodyForces(i)
+        F_next = F_next + self._BodyForces(i)
+
+        self.global_force_array[i + 1, :] = F_next
 
         self.acceleration_array[i + 1, :] = np.divide(
             self._SpringForces(p0, v0, self.timesteps[i], i), self.m
