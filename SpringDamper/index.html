@@ -1,0 +1,908 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../RigidBody/">
+      
+      
+        <link rel="next" href="../Forces/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.44">
+    
+    
+      
+        <title>Springs and Dampers - ROMtools</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#springdampers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="ROMtools" class="md-header__button md-logo" aria-label="ROMtools" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ROMtools
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Springs and Dampers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../RunConfiguration/" class="md-tabs__link">
+        
+  
+    
+  
+  Run Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../RigidBody/" class="md-tabs__link">
+        
+  
+    
+  
+  Rigid Bodies
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  Springs and Dampers
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Forces/" class="md-tabs__link">
+        
+  
+    
+  
+  Boundary Conditions
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Solver/" class="md-tabs__link">
+        
+  
+    
+  
+  Solver
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Animation/" class="md-tabs__link">
+        
+  
+    
+  
+  Animation
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="ROMtools" class="md-nav__button md-logo" aria-label="ROMtools" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ROMtools
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RunConfiguration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Run Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RigidBody/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rigid Bodies
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Springs and Dampers
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Springs and Dampers
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Attributes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Forces/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Boundary Conditions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Solver/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Solver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Animation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Animation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="springdampers">Spring/Dampers</h1>
+<p>A class to define non-rigid constraints between bodies using linear or rotational spring/damper series.</p>
+<hr />
+<h2 id="core-attributes">Core Attributes</h2>
+<p>The attributes below are universal to all springtypes.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k</td>
+<td>float</td>
+<td>Linear spring constant</td>
+</tr>
+<tr>
+<td>c</td>
+<td>float</td>
+<td>Linear damping constant</td>
+</tr>
+<tr>
+<td>p</td>
+<td>float</td>
+<td>initial spring compression</td>
+</tr>
+<tr>
+<td>constraint</td>
+<td>tuple [bool, bool, bool]</td>
+<td>(<span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(y\)</span>, <span class="arithmatex">\(\theta\)</span>) spring/damper constraints, if True then spring/damper does not act along the specified axis</td>
+</tr>
+<tr>
+<td>parent</td>
+<td>int</td>
+<td>ID of body 1 connected to spring/damper.  Relative angles and positions measured relative to this body</td>
+</tr>
+<tr>
+<td>parent_r</td>
+<td>double</td>
+<td>Radius of parent body</td>
+</tr>
+<tr>
+<td>child</td>
+<td>int</td>
+<td>ID of body 2 connected to spring/damper</td>
+</tr>
+<tr>
+<td>child_r</td>
+<td>radius of child body</td>
+<td></td>
+</tr>
+<tr>
+<td>xp, yp</td>
+<td>float</td>
+<td>Coordinates of parent body connection relative to parent body center of mass.  If parent body is None, then absolute coordinates of connection to rigid boundary</td>
+</tr>
+<tr>
+<td>xc, yc</td>
+<td>float</td>
+<td>Coordinates of child body connection relative to child body center of mass.  If child body is None, then absolute coordinates of connection to rigid boundary</td>
+</tr>
+<tr>
+<td>l0x, l0y, l0t</td>
+<td>float</td>
+<td>initial length (or angle) between the parent and child body.  Spring displacements are measured relative to this property.</td>
+</tr>
+<tr>
+<td>forcehist</td>
+<td>np.ndarray</td>
+<td>Array of shape (n_timestep, 4), with columns tracking the <span class="arithmatex">\(x-\)</span> and <span class="arithmatex">\(y-\)</span> force applied to the bodies, as well as the <span class="arithmatex">\(\theta_p-\)</span> and <span class="arithmatex">\(\theta_c-\)</span> torque applied to the parent and child bodies.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">class SpringDamper:
+
+    def __init__(
+        self,
+        k: float,
+        c: float,
+        p: float = 0.0,
+        parent: Optional[RigidBody] = None,
+        child: Optional[RigidBody] = None,
+        parent_pos: Tuple[float, float] = (0.0, 0.0),
+        child_pos: Tuple[float, float] = (0.0, 0.0),
+        dof_constraint: Tuple[bool, bool, bool] = (False, False, False)
+    ) -&gt; None:
+</code></pre>
+<hr />
+<h1 id="linear-springdampers">Linear Spring/Dampers</h1>
+<p>Linear spring/dampers are a generic element which can apply x- and y- forces to their parent and child bodies.  Torque can be applied to the parent and child bodies directly by defining the connection coordinates to be eccentric on the parent or child body.  Additional torque transfer can be defined through defining a spring force and damping force coupling coefficients, which enable the transfer of the normal spring/damper force to a tangential load similar to frictional effects.</p>
+<h2 id="attributes">Attributes</h2>
+<p>The attributes below are specific to the linear spring/damper class:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>"Linear", "Tensile", "Compressive", "Tabular"</td>
+<td>Spring force calculation method, see notes below</td>
+</tr>
+<tr>
+<td>mu</td>
+<td>tuple [float, float]</td>
+<td>Rotational wet and dry coupling coefficents, see notes below</td>
+</tr>
+<tr>
+<td>kcurve</td>
+<td>np.ndarray</td>
+<td>Force vs. displacement curve for tabular formulation, see notes below</td>
+</tr>
+</tbody>
+</table>
+<h2 id="methods">Methods</h2>
+<h2 id="_init_"><strong><em>_init</em></strong>_</h2>
+<p>Initialize a new linear spring/damper.</p>
+<pre><code class="language-python">class LinearSpringDamper(SpringDamper):
+
+    def __init__(
+        self,
+        k: float,
+        c: float,
+        p: float = 0,
+        parent: Optional[RigidBody] = None,
+        child: Optional[RigidBody] = None,
+        parent_pos: Tuple[float] = (0, 0),
+        child_pos: Tuple[float] = (0, 0),
+        dof_constraint: Tuple[bool] = (False, False, False),
+        track_force: bool = False,
+        type: Literal[&quot;Linear&quot;, &quot;Tensile&quot;, &quot;Compressive&quot;, &quot;Tabular&quot;] = &quot;Linear&quot;,
+        curve: np.ndarray = None,
+        mu:Tuple[float] = (0.0,0.0)
+    ) -&gt; None:
+
+#Define a spring connecting two rigid bodies, 
+#initially compressed and connected eccentrically to the child body, and track the force history
+spring12 = LinearSpringDamper(k=1000, c=10, p=-0.001, 
+                              parent=body1, child=body2, child_pos=(0.1, 0))
+
+#Define a compression-only spring with rotational coupling connected to the boundary
+spring12 = LinearSpringDamper(k=1000, c=10, p=-0.001, 
+                              parent=body1, type = &quot;Compressive&quot;, 
+                              mu=(0.05, 0.001))
+</code></pre>
+<p><strong>Inputs</strong></p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k</td>
+<td>float</td>
+<td>Linear spring constant</td>
+</tr>
+<tr>
+<td>c</td>
+<td>float</td>
+<td>Linear damping constant</td>
+</tr>
+<tr>
+<td>p</td>
+<td>float</td>
+<td>Initial spring displacement (positive = tension)</td>
+</tr>
+<tr>
+<td>parent</td>
+<td>RigidBody</td>
+<td>Connected body 1 (optional)</td>
+</tr>
+<tr>
+<td>child</td>
+<td>RigidBody</td>
+<td>Connected body 2 (optional)</td>
+</tr>
+<tr>
+<td>parent_pos</td>
+<td>tuple [float, float] (optional)</td>
+<td>x- and y- position of spring connection to parent body, defaults to None</td>
+</tr>
+<tr>
+<td>child_pos</td>
+<td>tuple [float, float] (optional)</td>
+<td>x- and y- position of spring connection to child body, defaults to None</td>
+</tr>
+<tr>
+<td>dof_constraint</td>
+<td>tuple [bool, bool, bool] (optional)</td>
+<td>degrees of freedom which the spring acts along, defaults to all DOF active</td>
+</tr>
+<tr>
+<td>type</td>
+<td>"Linear", "Tensile", "Compressive", "Tabular" (optional)</td>
+<td>Spring formulation, see notes below, defaults to Linear</td>
+</tr>
+<tr>
+<td>curve</td>
+<td>np.ndarray (optional)</td>
+<td>Force vs. displacement curve for tabular formulation, defaults to None</td>
+</tr>
+<tr>
+<td>mu</td>
+<td>tuple [float, float] (optional)</td>
+<td>Wet and dry rotational coupling, defaults to no coupling (0,0)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>LinearSpringDamper object</p>
+<h2 id="notes"><strong>Notes</strong></h2>
+<p><strong><em>Spring displacement calculation:</em></strong></p>
+<p>Each spring/damper connects to a parent body (denoted <span class="arithmatex">\(x_p\)</span>)to a child body (denoted <span class="arithmatex">\(x_c\)</span>).  A generic linear spring/damper connecting two bodies at an arbitrary point on each body <span class="arithmatex">\((\delta x_p, \delta y_p)\)</span> and <span class="arithmatex">\((\delta x_c, \delta y_c)\)</span>, the relative position and velocity of the connection points is given by:</p>
+<blockquote>
+<p><span class="arithmatex">\(\vec{r}_p = \langle x_p + \delta x_p \cos{\theta_p} - \delta y_p \sin{\theta_p}, y_p + \delta y_p \cos{\theta_p} + \delta x_p \sin{\theta_p}\rangle\)</span></p>
+<p><span class="arithmatex">\(\vec{v}_p = \langle \dot{x}_p + \dot{\theta}_p (- \delta x_p\sin{\theta_p} - \delta y_p \cos{\theta_p}), \dot{y}_p + \dot{\theta}_p (-\delta y_p \sin{\theta_p} + \delta x_p \cos{\theta_p})\rangle\)</span></p>
+</blockquote>
+<p>Subsequently, the relative displacement and velocity of the parent and child attachment points are given by:</p>
+<blockquote>
+<p><span class="arithmatex">\(\vec{r}_{rel} = \langle r_{px}-r_{cx}-l_{0x}, r_{py}-r_{cy}-l_{0y} \rangle = \langle \Delta r_x, \Delta r_y \rangle\)</span></p>
+<p><span class="arithmatex">\(\vec{v}_{rel} = \langle v_{px}-v_{cx}, v_{py}-v_{cy} \rangle = \langle \Delta v_x, \Delta v_y \rangle\)</span></p>
+</blockquote>
+<p>Spring and damper forces for each spring are calculated from the relative lengths and velocities calculated above.</p>
+<p><strong><em>Spring types:</em></strong></p>
+<p>Four formulations are available for the linear spring/damper.  The "Linear" option relates force to displacement using Hooke's law:</p>
+<blockquote>
+<p><span class="arithmatex">\(\vec{F}_k=k(||\vec{r}_{rel}||-l_0)\)</span></p>
+<p><span class="arithmatex">\(\vec{F}_c=c||\vec{v}_{rel}||\)</span></p>
+</blockquote>
+<p>The "Compressive" option relates force to displacement using Hooke's law only when the spring stretch is less than zero.  The "Tensile" option similarly only applies a force when the spring is in Tension.</p>
+<p>The "Tabular" option allows the definition of an arbitrary force vs. displacement curve.  Force will be interpolated along the curve during each force calculation.  <strong>this formulation is a work in progress</strong></p>
+<p><strong><em>Rotational coupling:</em></strong></p>
+<p>Torque may be applied by the spring due to an eccentric connection to the body creating a moment.  Additional coupling can be prescribed by specifying values <span class="arithmatex">\(\mu_k\)</span> and <span class="arithmatex">\(\mu_c\)</span> which transfer a portion of the spring and damper forces to a torque on the body.  The coefficients <span class="arithmatex">\(\mu_k\)</span> and <span class="arithmatex">\(\mu_c\)</span> are analogous to specifying a moment arm which the spring and damper forces will act on on the body:</p>
+<blockquote>
+<p><span class="arithmatex">\(T_{spring} = \vec{r} \times \vec{F}_{spring} + \mu_k ||\vec{F}_{spring}||(\theta_p - \theta_c) - \mu_c ||\vec{F}_{spring}||(\omega_p - \omega_c)\)</span></p>
+</blockquote>
+<hr />
+<h1 id="rotational-springdamper">Rotational Spring/Damper</h1>
+<p>Rotational spring/dampers are a generic element which can apply Torque to bodies based on their relative angle and angular velocity.</p>
+<h2 id="methods_1">Methods</h2>
+<h2 id="_init__1"><strong><em>_init</em></strong>_</h2>
+<p>Initialize a new rotational spring/damper.</p>
+<pre><code class="language-python">class RotationalSpringDamper(SpringDamper):
+
+    def __init__(
+        self,
+        k: float,
+        c: float,
+        p: float = 0,
+        parent: Optional[RigidBody] = None,
+        child: Optional[RigidBody] = None,
+        dof_constraint: Tuple[bool] = (False, False, False),
+    ) -&gt; None:
+
+#Define a rotational spring connecting two rigid bodies
+spring12 = RotationalSpringDamper(k=1000, c=10, p=-0.001, 
+                              parent=body1, child=body2)
+
+</code></pre>
+<p><strong>Inputs</strong></p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k</td>
+<td>float</td>
+<td>Linear spring constant</td>
+</tr>
+<tr>
+<td>c</td>
+<td>float</td>
+<td>Linear damping constant</td>
+</tr>
+<tr>
+<td>p</td>
+<td>float</td>
+<td>Initial spring displacement (positive = tension)</td>
+</tr>
+<tr>
+<td>parent</td>
+<td>RigidBody</td>
+<td>Connected body 1 (optional)</td>
+</tr>
+<tr>
+<td>child</td>
+<td>RigidBody</td>
+<td>Connected body 2 (optional)</td>
+</tr>
+<tr>
+<td>dof_constraint</td>
+<td>tuple [bool, bool, bool] (optional)</td>
+<td>degrees of freedom which the spring acts along, defaults to all DOF active</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>Rotational spring/damper object</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.path", "toc.integrate"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      
+    
+  </body>
+</html>
