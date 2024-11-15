@@ -223,7 +223,6 @@ class Solver:
             for f in self.bcs:
                 if type(f) == Force:
                     forces_out[f.dof] = forces_out[f.dof] + f.ft[i]
-                    print(forces_out)
 
         return forces_out
 
